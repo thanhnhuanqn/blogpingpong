@@ -1,0 +1,34 @@
+﻿@model Blog.Areas.admin.ViewModels.UserEdit
+    
+<h1>New User</h1>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary()
+
+    <div class="form-group">
+        @Html.LabelFor(f=>f.UserName)
+        @Html.TextBoxFor(f => f.UserName, new {@class = "form-control"})
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(f => f.Email)
+        @Html.TextBoxFor(f => f.Email, new { @class = "form-control" , type = "Email" })
+    </div>
+    
+    <div class="form-group">
+        @Html.LabelFor(f => f.Url)
+        @Html.TextBoxFor(f => f.Url, new { @class = "form-control", type = "Url" })
+    </div>
+
+
+    <div class="form-group">
+        @Html.LabelFor(f => f.DisplayName)
+        @Html.TextBoxFor(f => f.DisplayName, new { @class = "form-control" })
+    </div>
+
+    @Html.Partial("_RoleEditor", Model.Roles)
+    <input type="submit" value="Update User" class="btn btn-primary"/>
+    <a href="@Url.Action("Index")">or Cancel</a>
+
+}
