@@ -5,53 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - My ASP.NET Application</title>
     @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/admin")
     @Scripts.Render("~/bundles/modernizr")
 </head>
 <body>
-<div class="container">
-    <ul class="nav nav-pills">
-        <li class="@SelectedTab("posts")">
-            @Html.ActionLink("Posts", "Index", "Posts", new { area = "Admin" }, new { })
-        </li>
-        <li class="@SelectedTab("users")">
-            @Html.ActionLink("Users", "Index", "Users", new { area = "Admin" }, new { })
-        </li>
-        <li class="@SelectedTab("Category")">
-            @Html.ActionLink("Category", "Index", "Category", new { area = "Admin" }, new { })
-        </li>
-        <li class="@SelectedTab("Tag")">
-            @Html.ActionLink("Tags", "Index", "Tags", new { area = "Admin" }, new { })
-        </li>
+    <div class="container">
+        <ul class="nav nav-pills">
+            <li class="@SelectedTab("posts")">
+                @Html.ActionLink("Posts", "Index", "Posts", new { area = "Admin" }, new { })
+            </li>
+            <li class="@SelectedTab("users")">
+                @Html.ActionLink("Users", "Index", "Users", new { area = "Admin" }, new { })
+            </li>
+            <li class="@SelectedTab("Category")">
+                @Html.ActionLink("Category", "Index", "Category", new { area = "Admin" }, new { })
+            </li>
+            <li class="@SelectedTab("Tag")">
+                @Html.ActionLink("Tags", "Index", "Tags", new { area = "Admin" }, new { })
+            </li>
 
-        <li class="pull-right">
-            @Html.RouteLink("Back to website", "Home")
-        </li>
-    </ul>
+            <li class="pull-right">
+                @Html.RouteLink("Back to website", "Home")
+            </li>
+        </ul>
 
-</div>
-<div class="container body-content">
-    @RenderBody()
-    <hr />
-    <footer>
-        <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-    </footer>
-</div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
 
-@Scripts.Render("~/bundles/jquery")
-@Scripts.Render("~/bundles/bootstrap")
-@Scripts.Render("~/bundles/froms")
-@RenderSection("scripts", required: false)
-<form class="hidden" id="anti-forgery-form">
-    @Html.AntiForgeryToken()
-</form>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/froms")
+    @RenderSection("scripts", required: false)
+
+    <form class="hidden" id="anti-forgery-form">
+        @Html.AntiForgeryToken()
+    </form>
 </body>
 </html>
 @helper SelectedTab(string target)
 {
-    if (!string.IsNullOrWhiteSpace(ViewBag.SelectedTab))
+if (!string.IsNullOrWhiteSpace(ViewBag.SelectedTab))
+{
+    if (ViewBag.SelectedTab.Equals(target))
     {
-        if (ViewBag.SelectedTab.Equals(target))
-        {
             @: active
         }
     }

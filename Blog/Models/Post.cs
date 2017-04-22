@@ -52,11 +52,10 @@ namespace Blog.Models
 
         public virtual bool IsDeleted { get { return DeleteAt != null; } }
 
-        public virtual IList<Term> Category { get; set; }
-
+        public virtual IList<Term> Category { get; set; }        
         public Post()
-        {
-            
+        {            
+            Category = new List<Term>();
         }
         
     }
@@ -80,20 +79,34 @@ namespace Blog.Models
             Property(x=>x.Slug, x=>x.NotNullable(true));
             Property(x=>x.Excerpt, x=>x.NotNullable(false));
             Property(x=>x.Content, x=>x.NotNullable(true));
-
             Property(x => x.Status, x => x.NotNullable(false));
-            Property(x => x.CommentStatus, x => x.NotNullable(false));
             Property(x => x.Password, x => x.NotNullable(false));
             Property(x => x.Parent, x => x.NotNullable(false));
-            Property(x => x.Guid, x => x.NotNullable(false));
-            Property(x => x.MenuOrder, x => x.NotNullable(false));
-            Property(x => x.Type, x => x.NotNullable(true));
-            Property(x => x.CommentCount, x => x.NotNullable(false));
+            Property(x => x.Guid, x => x.NotNullable(false));            
+            Property(x => x.Type, x => x.NotNullable(true));            
 
             Property(x=>x.CreateAt, x =>
             {
                 x.Column("created_at");
                 x.NotNullable(true);
+            });
+
+            Property(x => x.CommentStatus, x =>
+            {
+                x.Column("comment_status");
+                x.NotNullable(false);
+            });
+
+            Property(x => x.MenuOrder, x =>
+            {
+                x.Column("menu_order");
+                x.NotNullable(false);
+            });
+
+            Property(x => x.MenuOrder, x =>
+            {
+                x.Column("comment_count");
+                x.NotNullable(false);
             });
 
             Property(x=>x.UpdateAt, x=>x.Column("updated_at"));
@@ -103,9 +116,11 @@ namespace Blog.Models
             Bag(x => x.Category, x =>
             {
                 x.Key(y => y.Column("post_id"));
-                x.Table("term_posts");
+                x.Table("term_posts");                
 
             }, x => x.ManyToMany(y => y.Column("term_id")));
+
+
 
         }
         

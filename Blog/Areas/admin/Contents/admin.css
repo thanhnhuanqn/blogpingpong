@@ -1,0 +1,146 @@
+﻿body {
+    background: #f1f1f1;
+    color: #444;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+    font-size: 13px;
+    line-height: 1.4em;
+    min-width: 600px;
+}
+h1, h2, h3 {
+    color: #23282d;
+}
+h1, h2, h3, h4, h5, h6 {
+    display: block;
+    font-weight: 600;
+}
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+.postbox .inside h2, .wrap [class$=icon32]+h2, .wrap h1, .wrap>h2:first-child {
+    font-size: 23px;
+    font-weight: 400;
+    margin: 0;
+    padding: 9px 0 4px;
+    line-height: 29px;
+}
+.wrap h1{
+    display: inline-block;
+    margin-right: 5px;
+}
+#title {
+    padding: 3px 8px;
+    font-size: 1.7em;
+    line-height: 100%;
+    height: 1.7em;
+    width: 100%;
+    outline: 0;
+    margin: 0 0 3px;
+    background-color: #fff;
+}
+input, select, textarea {
+    font-size: 14px;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+}
+input[type=text], input[type=search], input[type=radio], input[type=tel], input[type=time], input[type=url], input[type=week], input[type=password], input[type=checkbox], input[type=color], input[type=date], input[type=datetime], input[type=datetime-local], input[type=email], input[type=month], input[type=number], select, textarea {
+    border: 1px solid #ddd;
+    -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.07);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.07);
+    background-color: #fff;
+    color: #32373c;
+    outline: 0;
+    -webkit-transition: 50ms border-color ease-in-out;
+    transition: 50ms border-color ease-in-out;
+}
+a:active, a:hover {
+    color: #00a0d2;
+}
+.row-title {
+    font-size: 14px!important;
+    font-weight: 600;
+}
+.subsubsub a, .widefat a, .wp-filter a {
+    text-decoration: none;
+}
+table.widefat {
+    background: #fff;
+}
+
+input[type=radio], input[type=checkbox] {
+    border: 1px solid #b4b9be;
+    background: #fff;
+    color: #555;
+    clear: none;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 0;
+    height: 16px;
+    margin: -4px 4px 0 0;
+    outline: 0;
+    padding: 0!important;
+    text-align: center;
+    vertical-align: middle;
+    width: 16px;
+    min-width: 16px;    
+    -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    -webkit-transition: .05s border-color ease-in-out;    
+}
+.widefat * {
+    word-wrap: break-word;
+}
+.widefat thead th {
+    border-bottom: 1px solid #e1e1e1;
+}
+.hndle a, .widefat tfoot td, .widefat th, .widefat thead td {
+    font-weight: 400;
+}
+.widefat tfoot td, .widefat th, .widefat thead td {
+    text-align: left;
+    line-height: 1.3em;
+    font-size: 14px;
+}
+.fixed .column-author, .fixed .column-date, .fixed .column-format, .fixed .column-links, .fixed .column-parent, .fixed .column-posts {
+    width: 10%;
+}
+.fixed .column-categories, .fixed .column-rel, .fixed .column-response, .fixed .column-role, .fixed .column-tags {
+    width: 15%;
+}
+.fixed .column-comments {
+    width: 5.5em;
+    padding: 8px 0;
+    text-align: left;
+}
+ul.categorychecklist li {
+    margin: 0;
+    padding: 0;
+    line-height: 22px;
+    word-wrap: break-word;    
+}
+#poststuff .stuffbox>h3, #poststuff h2, #poststuff h3.hndle {
+    font-size: 14px;
+    padding: 8px 12px;
+    margin: 0;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+.postbox {
+    min-width: 255px;
+    border: 1px solid #e5e5e5;
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    background: #fff;
+}
+.postbox, .stuffbox {
+    margin-bottom: 20px;
+    padding: 10px 10px 0;
+    line-height: 1;
+}
+.postbox .hndle, .stuffbox .hndle {
+    border-bottom: 1px solid #eee;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

@@ -27,8 +27,18 @@ namespace Blog
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
 
+            bundles.Add(new StyleBundle("~/Content/admin").Include(
+                "~/Areas/admin/Contents/admin.css"));
+
             bundles.Add(new ScriptBundle("~/bundles/froms").Include(
                 "~/Areas/admin/Scripts/forms.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/ckeditor").Include(
+                "~/Areas/admin/Scripts/ckeditor/ckeditor.js",
+                "~/Areas/admin/Scripts/ckfinder/ckfinder.js"));
+
+            //BundleTable.EnableOptimizations = true;
         }
+        
     }
 }

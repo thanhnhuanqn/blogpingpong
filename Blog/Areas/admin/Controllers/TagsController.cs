@@ -47,7 +47,7 @@ namespace Blog.Areas.admin.Controllers
                 return View(form);
             }
 
-            category.Name = form.Name;
+            category.Name = form.Name.Trim();
             category.Slug = !string.IsNullOrEmpty(form.Slug) ? form.Slug.UrlFriendly() : form.Name.UrlFriendly();
             category.Taxonomy = "tag";
             category.Description = form.Description;            
@@ -67,7 +67,7 @@ namespace Blog.Areas.admin.Controllers
             return View(new CategoryNew
             {
                 Id = category.Id,
-                Name = category.Name,
+                Name = category.Name.Trim(),
                 Slug = category.Slug,
                 Description = category.Description,
                 Parent = category.Parent,
@@ -87,7 +87,7 @@ namespace Blog.Areas.admin.Controllers
                 return View(form);
             }
 
-            category.Name = form.Name;
+            category.Name = form.Name.Trim();
             category.Slug = !string.IsNullOrEmpty(form.Slug) ? form.Slug.UrlFriendly() : form.Name.UrlFriendly();
             category.Description = form.Description;
             category.Parent = form.Parent;
