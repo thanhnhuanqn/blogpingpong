@@ -23,13 +23,13 @@
 
     <div class="form-group">
         @Html.LabelFor(f => f.Url)
-        @Html.TextBoxFor(f => f.Url, new { @class = "form-control", type="Url"})
+        @Html.TextBoxFor(f => f.Url, new { @class = "form-control", type = "Url" })
     </div>
 
 
     <div class="form-group">
         @Html.LabelFor(f => f.DisplayName)
-        @Html.TextBoxFor(f => f.DisplayName, new { @class = "form-control"})
+        @Html.TextBoxFor(f => f.DisplayName, new { @class = "form-control" })
     </div>
     @Html.Partial("_RoleEditor", Model.Roles)
     <input type="submit" value="Create User" class="btn btn-primary" />

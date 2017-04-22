@@ -16,6 +16,12 @@
         <li class="@SelectedTab("users")">
             @Html.ActionLink("Users", "Index", "Users", new { area = "Admin" }, new { })
         </li>
+        <li class="@SelectedTab("Category")">
+            @Html.ActionLink("Category", "Index", "Category", new { area = "Admin" }, new { })
+        </li>
+        <li class="@SelectedTab("Tag")">
+            @Html.ActionLink("Tags", "Index", "Tags", new { area = "Admin" }, new { })
+        </li>
 
         <li class="pull-right">
             @Html.RouteLink("Back to website", "Home")
@@ -33,7 +39,11 @@
 
 @Scripts.Render("~/bundles/jquery")
 @Scripts.Render("~/bundles/bootstrap")
+@Scripts.Render("~/bundles/froms")
 @RenderSection("scripts", required: false)
+<form class="hidden" id="anti-forgery-form">
+    @Html.AntiForgeryToken()
+</form>
 </body>
 </html>
 @helper SelectedTab(string target)

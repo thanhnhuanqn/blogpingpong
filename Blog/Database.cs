@@ -29,6 +29,8 @@ namespace Blog
             var mapper = new ModelMapper();
             mapper.AddMapping<UserMap>();
             mapper.AddMapping<RoleMap>();
+            mapper.AddMapping<TermMap>();
+            mapper.AddMapping<PostMap>();
             //mapper.AddMapping<TagMap>();
             //mapper.AddMapping<PostMap>();
 

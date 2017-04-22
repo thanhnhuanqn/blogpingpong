@@ -216,8 +216,11 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Areas\admin\adminAreaRegistration.cs" />
+    <Compile Include="Areas\admin\Controllers\CategoryController.cs" />
     <Compile Include="Areas\admin\Controllers\PostsController.cs" />
+    <Compile Include="Areas\admin\Controllers\TagsController.cs" />
     <Compile Include="Areas\admin\Controllers\UsersController.cs" />
+    <Compile Include="Areas\admin\ViewModels\Category.cs" />
     <Compile Include="Areas\admin\ViewModels\Users.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -236,11 +239,13 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Models\Role.cs" />
+    <Compile Include="Models\Term.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\admin\Scripts\forms.js" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="favicon.ico" />
@@ -260,6 +265,14 @@
     <Content Include="Areas\admin\Views\Users\_RoleEditor.cshtml" />
     <Content Include="Areas\admin\Views\Users\Edit.cshtml" />
     <Content Include="Areas\admin\Views\Posts\Index.cshtml" />
+    <Content Include="Areas\admin\Views\Category\Index.cshtml" />
+    <Content Include="Areas\admin\Views\Category\New.cshtml" />
+    <Content Include="Areas\admin\Views\Category\_CategoryEditor.cshtml" />
+    <Content Include="Areas\admin\Views\Category\Edit.cshtml" />
+    <Content Include="Areas\admin\Views\Users\ResetPassword.cshtml" />
+    <Content Include="Areas\admin\Views\Tags\Index.cshtml" />
+    <Content Include="Areas\admin\Views\Tags\New.cshtml" />
+    <Content Include="Areas\admin\Views\Tags\Edit.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />

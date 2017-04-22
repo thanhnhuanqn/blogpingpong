@@ -25,8 +25,7 @@ namespace Blog
         }
 
         protected void Application_EndRequest()
-        {
-            Database.Session.Flush();
+        {            
             Database.CloseSession();
         }
     }

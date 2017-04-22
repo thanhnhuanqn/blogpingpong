@@ -84,7 +84,7 @@ namespace Blog.Areas.admin.Controllers
             user.ActivationKey = BCrypt.Net.BCrypt.GenerateSalt();
 
             Database.Session.Save(user);           
-                        
+            Database.Session.Flush();
             return RedirectToAction("Index");
         }
 
@@ -126,9 +126,50 @@ namespace Blog.Areas.admin.Controllers
             user.Url = form.Url;
             user.DisplayName = string.IsNullOrEmpty(form.DisplayName) ? user.UserName : form.DisplayName;
 
-            Database.Session.Update(user);            
+            Database.Session.Update(user);
+            Database.Session.Flush();
 
             return RedirectToAction("Index");
         }
+
+        public ActionResult ResetPassword(int id)
+        {
+            var user = Database.Session.Load<User>(id);
+            if (user == null) return HttpNotFound();
+
+            return View(new UsersResetPassword
+            {
+                UserName = user.UserName
+            });
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public ActionResult ResetPassword(int id, UsersResetPassword form)
+        {
+            var user = Database.Session.Load<User>(id);
+            if (user == null) return HttpNotFound();
+
+            if (!ModelState.IsValid) return View(form);
+
+            user.SetPassword(form.Password);
+
+            Database.Session.Update(user);
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public ActionResult Delete(int id, UsersResetPassword form)
+        {
+            var user = Database.Session.Load<User>(id);
+
+            if (user == null) return HttpNotFound();
+
+            Database.Session.Delete(user);
+            Database.Session.Flush();
+            return RedirectToAction("Index");
+
+        }
+
     }
 }

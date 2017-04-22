@@ -66,5 +66,13 @@ namespace Blog.Areas.admin.ViewModels
 
     }
 
+    public class UsersResetPassword
+    {
+        public string UserName { get; set; }
+
+        [Required, DataType(DataType.Password)]
+        public string Password { get; set; }
+    }
+
 
 }

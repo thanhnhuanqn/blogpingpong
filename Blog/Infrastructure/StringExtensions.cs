@@ -6,7 +6,7 @@ using System.Web;
 
 namespace Blog.Infrastructure
 {
-    public class StringExtensions
+    public  static class StringExtensions
     {
         /// <summary>
         /// Loại bỏ các ký tự có đấu ra khỏi một post_name hay một term_name
@@ -49,7 +49,7 @@ namespace Blog.Infrastructure
         /// </summary>
         /// <param name="title">chuổi đường dẫn cần định dạng lại</param>
         /// <returns>Chuổi đã được định dạng</returns>
-        public static string UrlFriendly(string title)
+        public static string UrlFriendly(this string title)
         {
             if (!string.IsNullOrEmpty(title))
             {
