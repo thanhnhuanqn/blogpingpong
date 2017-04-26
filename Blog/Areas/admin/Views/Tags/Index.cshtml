@@ -1,45 +1,48 @@
 ﻿@model Blog.Areas.admin.ViewModels.CategoryIndex
-    @{
-        ViewBag.Title = "Manager Tags";
-    }
-<br />
-<div class="btn-toolbar">
-    <a href="@Url.Action("new")" class="btn btn-primary btn-sm">
-        <i class="glyphicon glyphicon-plus"></i> Create Tag
-    </a>
+@{
+    ViewBag.Title = "Manager Tags";
+}
+<div class="wrap">
+    <h1>Tags</h1>
+    <div class="btn-toolbar">
+        <a href="@Url.Action("new")" class="btn btn-primary btn-sm">
+            <i class="glyphicon glyphicon-plus"></i> Create Tag
+        </a>
+    </div>
+    <br />
+    <table class="table table-hover widefat table-responsive fixed">
+        <thead>
+            <tr>
+                <th class="check-column">
+                    <input type="checkbox" name="actionDelete" value="all" id="select-all" />
+                </th>
+                <th>Name</th>
+                <th class="column-slug">Slug</th>
+                <th class="column-description">Description</th>
+                <th class="column-posts">Count</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        @foreach (var tag in Model.Category)
+            {
+            <tr>
+                <td class="check-column"><input type="checkbox" name="actionDelete" value="@tag.Slug" /> </td>
+                <td><a href="@Url.Action("edit", new {tag.Id})">@tag.Name</a></td>
+                <td>@tag.Slug</td>
+                <td>@tag.Description</td>
+                <td>@tag.Count</td>
+                <td>
+                    <div class="btn-group" style="min-width: 111px;">
+                        <a href="@Url.Action("edit", new {tag.Id})" class="btn btn-xs btn-primary">
+                            <i class="glyphicon glyphicon-edit"></i> Edit
+                        </a>
+                        <a href="@Url.Action("Delete", new { tag.Id })" class="btn btn-xs btn-danger"
+                           data-post="Are you sure you want to delete '@tag.Name'">
+                            <i class="glyphicon glyphicon-remove"></i> Delete
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </table>
 </div>
-<br />
-<table class="table table-hover widefat table-responsive">
-    <tr>
-        <th class="check-column">
-            <input type="checkbox" name="actionDelete" value="all" id="select-all" />
-        </th>
-        <th>Name</th>
-        <th class="column-slug">Slug</th>
-        <th class="column-description">Description</th>
-        <th class="column-posts">Count</th>
-        <th>Actions</th>
-    </tr>
-    @foreach (var tag in Model.Category)
-    {
-        <tr>
-            <td class="check-column"><input type="checkbox" name="actionDelete" value="@tag.Slug" /> </td>
-            <td><a href="@Url.Action("edit", new {tag.Id})">@tag.Name</a></td>
-            <td>@tag.Slug</td>
-            <td>@tag.Description</td>
-            <td>@tag.Count</td>
-            <td>
-                <div class="btn-group" style="min-width: 111px;">
-                    <a href="@Url.Action("edit", new {tag.Id})" class="btn btn-xs btn-primary">
-                        <i class="glyphicon glyphicon-edit"></i> Edit
-                    </a>               
-                    <a href="@Url.Action("Delete", new { tag.Id })" class="btn btn-xs btn-danger"
-                       data-post="Are you sure you want to delete '@tag.Name'">
-                        <i class="glyphicon glyphicon-remove"></i> Delete
-                    </a>
-                </div>
-            </td>
-        </tr>
-    }
-</table> 
-

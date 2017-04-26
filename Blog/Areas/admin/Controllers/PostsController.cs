@@ -15,83 +15,98 @@ namespace Blog.Areas.admin.Controllers
     [SelectedTab("posts")]
     public class PostsController : Controller
     {
-        private string Type = "post";
-        private const int PostsPerPage = 50;
+        private string PostType = "post";
 
-        private const int defaultPageSize = 15;
-        
+        private const int DefaultPageSize = 15;
+
 
         // GET: admin/Posts
         public ActionResult Index(int? page)
         {
-            int currentPageIndex = page.HasValue ? page.Value - 1 : 0;
+            var currentPageIndex = page - 1 ?? 0;
 
-            return View(Database.Session.Query<Post>().Where(p=>p.Type == Type).OrderByDescending(t=>t.CreateAt).ToPagedList(currentPageIndex, defaultPageSize));
+            return View(Database.Session.Query<Post>().Where(p => p.Type == PostType).OrderByDescending(t => t.CreateAt).ToPagedList(currentPageIndex, DefaultPageSize));
         }
 
         public ActionResult New()
         {
             return View(new PostsForm
-            {             
-                Day  = DateTime.Now.Day,
+            {
+                Day = DateTime.Now.Day,
                 Month = DateTime.Now.Month,
                 Year = DateTime.Now.Year,
                 Hour = DateTime.Now.Hour,
                 Minutes = DateTime.Now.Minute,
-                Tags = Database.Session.Query<Term>().Where(t=>t.Taxonomy=="tag").ToList(),
-                Category = Database.Session.Query<Term>().Where(t=>t.Taxonomy=="cat").ToList()
+                Tags = Database.Session.Query<Term>().Where(t => t.Taxonomy == "tag").ToList(),
+                Category = Database.Session.Query<Term>().Where(t => t.Taxonomy == "cat").ToList()
             });
         }
 
-        private void UpdateOrCreateTag(string tags, Post post)
-        {            
+        public static void AddCategoriesTagsPost(Post post, string listTag, string categories)
+        {
+            
+            if (post == null) return;
 
-            if (!string.IsNullOrEmpty(tags))
+            var tags = new List<Term>();
+
+            if (!string.IsNullOrEmpty(listTag))
             {
-                var listTags = tags.Split(',').Where(t => t != string.Empty).ToArray();
+                var listTags = listTag.Split(',').Where(t => t != string.Empty).Distinct().ToArray();
 
                 foreach (var tag in listTags)
                 {
-                    if (!string.IsNullOrWhiteSpace(tag.Trim())) { 
-                        var t = Database.Session.Query<Term>().SingleOrDefault(x => x.Slug == tag.UrlFriendly());
-                        if (t != null)
+                    if (string.IsNullOrWhiteSpace(tag.Trim())) continue;
+
+                    var t = Database.Session.Query<Term>().SingleOrDefault(x => x.Slug == tag.UrlFriendly());
+                    if (t != null)
+                    {
+                        tags.Add(t);
+                    }
+                    else
+                    {
+                        var newTag = new Term
                         {
-                            post.Category.Add(t);
-                        }
-                        else
+                            Id = 0,
+                            Name = tag.Trim(),
+                            Slug = tag.UrlFriendly(),
+                            Taxonomy = "tag",
+                            Description = "new tag add from post",
+                            Count = 1
+                        };
+                        Database.Session.Save(newTag);
+                        var oldTag = Database.Session.Query<Term>().FirstOrDefault(x => x.Slug == newTag.Slug);
+                        if (oldTag != null)
                         {
-                            var newTag = new Term
-                            {
-                                Name = tag.Trim(),
-                                Slug = tag.UrlFriendly(),
-                                Taxonomy = "tag",
-                                Description = "new tag add from post",
-                                Count = 1
-                            };
-                            Database.Session.Save(newTag);
-                            Database.Session.Flush();
-                            var oldTag = Database.Session.Query<Term>().FirstOrDefault(x => x.Slug == newTag.Slug);
-                            if (oldTag != null)
-                            {
-                                post.Category.Add(oldTag);
-                            }
+                            tags.Add(oldTag);
                         }
                     }
                 }
             }
+            if (!string.IsNullOrEmpty(categories))
+            {
+                var listCategories = categories.Split(',').Where(t => t != string.Empty).Distinct().ToArray();
+
+                //var catList = listCategories.Select(category => Database.Session.Load<Term>(long.Parse(category))).Where(cat => cat != null).ToList();
+                tags.AddRange(from category in listCategories where category != null select Database.Session.Load<Term>(Convert.ToInt64(category)) into cat where cat != null select cat);
+            }
+
+            post.Category = tags;
+
+            if (post.Category == null) return;
+            
+            Database.Session.Update(post);
+            Database.Session.Flush();
         }
 
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult New(PostsForm form)
         {
-            var categories = Request["categories"];
-            var tags = Request["ctags"];
-
-            if (string.IsNullOrEmpty(categories))
+            if (string.IsNullOrEmpty(Request["categories"]))
             {
                 ModelState.AddModelError("categories", "Category is not set");
             }
             if (!ModelState.IsValid)
+            {                
                 return View(new PostsForm
                 {
                     Day = DateTime.Now.Day,
@@ -102,55 +117,67 @@ namespace Blog.Areas.admin.Controllers
                     Tags = Database.Session.Query<Term>().Where(t => t.Taxonomy == "tag").ToList(),
                     Category = Database.Session.Query<Term>().Where(t => t.Taxonomy == "cat").ToList()
                 });
-
-            //var selectedTags = ReconsileTags(form.Tags);
-
-
+            }
+            
             var post = new Post
             {
                 CreateAt = new DateTime(form.Year, form.Month, form.Day, form.Hour, form.Minutes, 0, 0),
                 User = Database.Session.Load<User>(1),
                 Title = form.Title,
-                Slug = !String.IsNullOrEmpty(form.Slug) ? form.Slug.UrlFriendly() : form.Title.UrlFriendly(),
+                Slug = !string.IsNullOrEmpty(form.Slug) ? form.Slug.UrlFriendly() : form.Title.UrlFriendly(),
                 Excerpt = form.Excerpt,
                 Content = form.Content,
-                Type = "post",
+                Type = PostType,
                 Status = form.Status,
                 CommentStatus = "open"
-            };            
-
-            UpdateOrCreateTag(tags, post);
-
-            var listCategories = categories.Split(',').Where(t => t != string.Empty).ToArray();
-            
-            foreach (var category in listCategories)
-            {
-
-                var cat = Database.Session.Load<Term>(Int64.Parse(category));
-                
-                cat.Count = cat.Posts.Count();
-                Database.Session.Update(cat);
-                Database.Session.Flush();
-                post.Category.Add(cat);
-            }
-
+            };
 
             Database.Session.Save(post);
-            Database.Session.Flush();
 
-            return RedirectToAction("Index");
+            var postNew = Database.Session.Query<Post>().FirstOrDefault(t => t.Slug == post.Slug);
+
+            if (postNew == null) return RedirectToAction("Index");
+
+            post.Id = postNew.Id;
+
+            post.Category = new List<Term>();
+
+            post.CreateKeyValue(postNew.Id, "sticky", Request["Sticky"]);
+            post.CreateKeyValue(postNew.Id, "keyword", Request["keyword"]);
+                
+            AddCategoriesTagsPost(post, Request["ctags"], Request["categories"]);
+
+            TempData["FlashSuccess"] = "Created success!";
+
+            return RedirectToAction("Edit", new { id = postNew.Id });
         }
+
 
 
         public ActionResult Edit(int id)
         {
             //var post = Database.Session.Load<Post>((Int64)id);
             var post = Database.Session.Query<Post>().SingleOrDefault(t => t.Id == id);
-                        
+
             if (post == null) return HttpNotFound();
 
             ViewBag.Category = Database.Session.Query<Term>().Where(t => t.Taxonomy == "cat").ToList();
 
+            var stick = string.Empty;
+
+            var metaSticky = post.PostMetas.FirstOrDefault(t => t.PostId == id && t.MetaKey == "sticky");
+            if (metaSticky != null)
+            {
+                stick = metaSticky.MetaValue;
+            }
+            var keyword = post.PostMetas.FirstOrDefault(t => t.PostId == id && t.MetaKey == "keyword");
+
+            var keyw = string.Empty;
+
+            if (keyword != null)
+            {
+                keyw = keyword.MetaValue;
+            }
             return View(new PostsForm
             {
                 Id = id,
@@ -163,8 +190,10 @@ namespace Blog.Areas.admin.Controllers
                 Minutes = post.CreateAt.Minute,
                 Hour = post.CreateAt.Hour,
                 Content = post.Content,
-                Status = post.Status,                
-                Category =  post.Category
+                Status = post.Status,
+                Category = post.Category,
+                Sticky = stick,
+                Keyword = keyw
             });
 
         }
@@ -173,7 +202,7 @@ namespace Blog.Areas.admin.Controllers
         public ActionResult Edit(int id, PostsForm form)
         {
             var post = Database.Session.Load<Post>((Int64)id);
-            
+
 
             if (post == null) return HttpNotFound();
 
@@ -182,6 +211,8 @@ namespace Blog.Areas.admin.Controllers
             post.Category = new List<Term>();
 
             if (!ModelState.IsValid)
+            {
+                TempData["FlashWarning"] = "Update error!";
                 return View(new PostsForm
                 {
                     Id = id,
@@ -194,55 +225,32 @@ namespace Blog.Areas.admin.Controllers
                     Minutes = post.CreateAt.Minute,
                     Hour = post.CreateAt.Hour,
                     Content = post.Content,
-                    Status = post.Status,                    
+                    Status = post.Status,
                     Category = post.Category
                 });
-
-            var categories = Request["categories"];
-            var tags = Request["ctags"];
-
+            }
             post.User = Database.Session.Load<User>(1);
 
             post.UpdateAt = new DateTime(form.Year, form.Month, form.Day, form.Hour, form.Minutes, 0, 0);
-            
+
             post.Title = form.Title;
-            post.Slug = !String.IsNullOrEmpty(form.Slug) ? form.Slug.UrlFriendly() : form.Title.UrlFriendly();
+            post.Slug = !string.IsNullOrEmpty(form.Slug) ? form.Slug.UrlFriendly() : form.Title.UrlFriendly();
             post.Excerpt = form.Excerpt;
             post.Content = form.Content;
-            post.Type = "post";
+            post.Type = PostType;
             post.Status = form.Status;
             post.CommentStatus = "open";
-
-            post.Category = null;
+            post.Category = null;            
             Database.Session.Update(post);
 
-            post.Category = new List<Term>();
+            AddCategoriesTagsPost(post, Request["ctags"], Request["categories"]);
 
-            UpdateOrCreateTag(tags, post);
-            
-            var listCategories = categories.Split(',').Where(t => t != string.Empty).ToArray();
+            post.CreateKeyValue(post.Id, "sticky", form.Sticky);
+            post.CreateKeyValue(post.Id, "keyword", form.Keyword);
 
-            foreach (var category in listCategories)
-            {
-                var cat = Database.Session.Load<Term>(Int64.Parse(category));
-
-                if (cat != null)
-                {
-                    cat.Count = cat.Posts.Count();
-                    Database.Session.Update(cat);
-                    Database.Session.Flush();
-                    post.Category.Add(cat);
-                }
-            }
-
-
-            Database.Session.Update(post);
-            Database.Session.Flush();
-
-            return RedirectToAction("Index");
+            TempData["FlashSuccess"] = "Updated success!";
+            return RedirectToAction("Edit", new {id = id});
         }
-
-
 
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult Trash(int id)
@@ -251,7 +259,7 @@ namespace Blog.Areas.admin.Controllers
 
             if (post == null) return HttpNotFound();
 
-            post.DeleteAt = DateTime.UtcNow;
+            post.DeleteAt = DateTime.Now;
             Database.Session.Update(post);
 
             return RedirectToAction("Index");
@@ -267,6 +275,8 @@ namespace Blog.Areas.admin.Controllers
 
             Database.Session.Delete(post);
             Database.Session.Flush();
+
+            TempData["FlashSuccess"] = "Deleted success!";
             return RedirectToAction("Index");
 
         }
@@ -283,35 +293,6 @@ namespace Blog.Areas.admin.Controllers
 
             return RedirectToAction("Index");
 
-        }
-
-        private IEnumerable<Term> ReconsileTags(IEnumerable<Term> tags)
-        {
-            foreach (var tag in tags)
-            {
-                if (tag.Id > 0 )
-                {
-                    yield return Database.Session.Load<Term>(tag.Id);
-                }
-
-                var existingTag = Database.Session.Query<Term>().FirstOrDefault(t => t.Name == tag.Name);
-
-                if (existingTag != null)
-                {
-                    yield return existingTag;
-                    continue;
-                }
-
-                var newTag = new Term
-                {
-                    Name = tag.Name,
-                    Slug = tag.Name.UrlFriendly(),
-                    Taxonomy = "tag"
-                };
-
-                Database.Session.Save(newTag);
-                yield return newTag;
-            }
         }
     }
 }

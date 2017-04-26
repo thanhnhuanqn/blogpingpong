@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using Blog.Infrastructure;
 using Blog.Models;
+using NHibernate.Linq;
 using Paging;
 
 namespace Blog.Areas.admin.ViewModels
@@ -71,10 +72,12 @@ namespace Blog.Areas.admin.ViewModels
         public virtual IList<Term> Category { get; set; }
         public virtual IList<Term> Tags { get; set; }
 
+        public virtual string Sticky { get; set; }
+
         public PostsForm()
         {
             Tags = new List<Term>();
-            Category = new List<Term>();
+            Category = new List<Term>();            
         }
 
 

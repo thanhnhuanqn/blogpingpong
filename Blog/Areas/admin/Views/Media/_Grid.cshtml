@@ -1,0 +1,17 @@
+﻿@using Paging
+@model Paging.IPagedList<Blog.Models.Post>
+
+<div class="wrap">
+    @foreach (var image in Model)
+    {
+        <div class="block-inline-img">
+            <div class="thumb">
+                <div class="centered">
+                    <a href="#@image.Slug">
+                        <img src="~/uploads/medium/@image.Guid" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

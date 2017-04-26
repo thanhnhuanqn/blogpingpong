@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using NHibernate.Bytecode.CodeDom;
+using NHibernate.Linq;
 using NHibernate.Mapping;
 using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
@@ -17,7 +18,7 @@ namespace Blog.Models
     }
     public class Post
     {
-        public virtual Int64 Id { get; set; }        
+        public virtual long Id { get; set; }        
 
         public virtual User User { get; set; }
 
@@ -35,7 +36,7 @@ namespace Blog.Models
 
         public virtual string Password { get; set; }
 
-        public virtual Int64 Parent { get; set; }
+        public virtual long Parent { get; set; }
 
         public virtual string Guid { get; set; }
 
@@ -50,14 +51,39 @@ namespace Blog.Models
         public virtual DateTime? UpdateAt { get; set; }
         public virtual DateTime? DeleteAt { get; set; }
 
-        public virtual bool IsDeleted { get { return DeleteAt != null; } }
+        public virtual bool IsDeleted => DeleteAt != null;
 
         public virtual IList<Term> Category { get; set; }        
+        public virtual IList<PostMeta> PostMetas { get; set; }        
         public Post()
         {            
             Category = new List<Term>();
+            PostMetas = new List<PostMeta>();
         }
-        
+
+
+        public virtual void CreateKeyValue(long postId, string metaKey, string metaValue = "")
+        {
+            DeleteMetaKey(postId, metaKey);
+            if (!string.IsNullOrEmpty(metaValue))
+            {
+                var p = new PostMeta
+                {
+                    PostId = postId,
+                    MetaKey = metaKey,
+                    MetaValue = metaValue
+                };
+                Database.Session.Save(p);
+            }
+        }
+
+        public virtual void DeleteMetaKey(long postId, string metaKey)
+        {
+            if (postId <= 0) return;            
+            var sql = "DELETE FROM postmeta WHERE post_id = ? and meta_key = ?";
+            Database.Session.CreateSQLQuery(sql).SetInt64(0, postId).SetString(1, metaKey).ExecuteUpdate();
+        }
+
     }
 
     public class PostMap : ClassMapping<Post>
@@ -116,12 +142,36 @@ namespace Blog.Models
             Bag(x => x.Category, x =>
             {
                 x.Key(y => y.Column("post_id"));
-                x.Table("term_posts");                
+                x.Table("term_posts");                                
 
-            }, x => x.ManyToMany(y => y.Column("term_id")));
+            }, x => x.ManyToMany(y =>
+                {
+                    y.Column("term_id");
+                    y.NotFound(NotFoundMode.Ignore);
+                }
+            ));
 
 
+            //Bag(x => x.PostMetas, x =>
+            //{
+            //    x.Key(y => y.Column("post_id"));
+            //    x.Table("postmeta");
 
+            //},x=>x.OneToMany());
+
+            Bag(x => x.PostMetas, x =>
+            {
+                x.Key(y =>
+                {
+                    y.Column("post_id");                    
+                });
+                x.Cascade(Cascade.All | Cascade.DeleteOrphans);
+                x.Lazy(CollectionLazy.Lazy);
+                x.Inverse(true);
+            }, x =>
+            {
+                x.OneToMany();                
+            });
         }
         
     }

@@ -31,6 +31,7 @@ namespace Blog
             mapper.AddMapping<RoleMap>();
             mapper.AddMapping<TermMap>();
             mapper.AddMapping<PostMap>();
+            mapper.AddMapping<PostMetaMap>();
             //mapper.AddMapping<TagMap>();
             //mapper.AddMapping<PostMap>();
 

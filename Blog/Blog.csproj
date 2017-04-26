@@ -219,10 +219,14 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Areas\admin\adminAreaRegistration.cs" />
+    <Compile Include="Areas\admin\Controllers\AppearanceController.cs" />
     <Compile Include="Areas\admin\Controllers\CategoryController.cs" />
+    <Compile Include="Areas\admin\Controllers\MediaController.cs" />
+    <Compile Include="Areas\admin\Controllers\PagesController.cs" />
     <Compile Include="Areas\admin\Controllers\PostsController.cs" />
     <Compile Include="Areas\admin\Controllers\TagsController.cs" />
     <Compile Include="Areas\admin\Controllers\UsersController.cs" />
+    <Compile Include="Areas\admin\ViewModels\Appearence.cs" />
     <Compile Include="Areas\admin\ViewModels\Category.cs" />
     <Compile Include="Areas\admin\ViewModels\Post.cs" />
     <Compile Include="Areas\admin\ViewModels\Users.cs" />
@@ -238,10 +242,12 @@
     <Compile Include="Infrastructure\StringExtensions.cs" />
     <Compile Include="Infrastructure\TransactionFilter.cs" />
     <Compile Include="Migrations\_001_TablesBlog.cs" />
+    <Compile Include="Migrations\_002_PostMeta.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Post.cs" />
+    <Compile Include="Models\PostMeta.cs" />
     <Compile Include="Models\Role.cs" />
     <Compile Include="Models\Term.cs" />
     <Compile Include="Models\User.cs" />
@@ -1110,7 +1116,6 @@
     <Content Include="Areas\admin\Views\Tags\New.cshtml" />
     <Content Include="Areas\admin\Views\Tags\Edit.cshtml" />
     <Content Include="Areas\admin\Views\Posts\New.cshtml" />
-    <Content Include="Areas\admin\Views\Posts\Form.cshtml" />
     <Content Include="Areas\admin\Scripts\ckeditor\CHANGES.md" />
     <Content Include="Areas\admin\Scripts\ckeditor\LICENSE.md" />
     <Content Include="Areas\admin\Scripts\ckeditor\plugins\scayt\LICENSE.md" />
@@ -1127,6 +1132,16 @@
     <Content Include="Areas\admin\Views\Posts\Edit.cshtml" />
     <Content Include="Areas\admin\Views\Shared\DisplayTemplates\Bootstrap3Pagination.cshtml" />
     <Content Include="Areas\admin\Views\Shared\DisplayTemplates\BootstrapPagination.cshtml" />
+    <Content Include="Areas\admin\Views\Pages\Index.cshtml" />
+    <Content Include="Areas\admin\Views\Pages\New.cshtml" />
+    <Content Include="Areas\admin\Views\Pages\Edit.cshtml" />
+    <Content Include="Areas\admin\Views\Media\Index.cshtml" />
+    <Content Include="Areas\admin\Views\Media\_List.cshtml" />
+    <Content Include="Areas\admin\Views\Media\_Grid.cshtml" />
+    <Content Include="Areas\admin\Views\Media\_FormUpload.cshtml" />
+    <Content Include="Areas\admin\Views\Shared\_FlashMessage.cshtml" />
+    <Content Include="Areas\admin\Views\Appearance\Index.cshtml" />
+    <Content Include="Areas\admin\Views\Appearance\Menu.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -1180,6 +1195,9 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\admin\Models\" />
+    <Folder Include="Uploads\Large\" />
+    <Folder Include="Uploads\Medium\" />
+    <Folder Include="Uploads\Thumb\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

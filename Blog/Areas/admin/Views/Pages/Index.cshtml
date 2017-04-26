@@ -1,0 +1,60 @@
+﻿@using Paging
+@model Paging.IPagedList<Blog.Models.Post>
+@{
+    ViewBag.Title = "Manager pages";
+}
+<div class="wrap">
+    <h1>Pages</h1>
+    <div class="btn-toolbar">
+        <div class="btn-group">
+            <a href="@Url.Action("new")" class="btn btn-primary btn-sm">
+                <i class="glyphicon glyphicon-plus"></i> Create Page
+            </a>
+        </div>
+        <br />
+        <br />
+        <br />
+        <div>
+            <table class="table table-hover widefat table-responsive fixed">
+                <thead>
+                    <tr>
+                        <th style="width: 3%"><input id="cb-select-all-1" type="checkbox"></th>
+                        <th class="column-title">Title</th>
+                        <th class="column-author">Author</th>                        
+                        <th class="column-date">Date</th>
+                        <th style="width: 5%"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var cls = "";
+                        if (item.IsDeleted)
+                        {
+                            cls = "danger";
+                        }
+                        <tr class="@cls">
+                            <td><input id="checkbox-@item.Id" type="checkbox" /></td>
+                            <td class="row-title"><a href="@Url.Action("edit", new {item.Id})">@item.Title</a></td>
+                            <td>@item.User.UserName</td>                                                                                    
+                            <td>@item.CreateAt</td>
+                            <td>
+                                <a href="@Url.Action("delete", new {item.Id})" class="btn btn-danger btn-xs" data-post="Are you sure you want to delete this post ?">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="pager">
+                @Html.Pager(Model.PageSize, Model.PageNumber, Model.TotalItemCount).Options(o => o
+                    .DisplayTemplate("Bootstrap3Pagination")
+                    .MaxNrOfPages(14)
+                    .AlwaysAddFirstPageNumber()
+                    .HidePreviousAndNextPage()
+                    )
+            </div>
+        </div>
+    </div>
+</div>

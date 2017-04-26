@@ -1,0 +1,244 @@
+﻿@using Blog.Models
+@model Blog.Areas.admin.ViewModels.Appearence
+
+@{
+    ViewBag.Title = "Manager Menu, Themes and more";
+}
+
+<div class="wrap">
+    <h1>Menus</h1><br />
+    <div class="btn-toolbar">
+        <div class="btn-group btn-group-sm">
+            <a class="btn btn-primary" href="@Url.Action("Themes", "Appearance")">Themes</a>
+            <a class="btn btn-default" href="@Url.Action("Editor", "Appearance")">Editor</a>
+            <a class="btn btn-info" href="@Url.Action("Index", "Appearance")">Editor</a>
+        </div>
+    </div>
+    <br />
+    @Html.Partial("_FlashMessage")
+    <div class="row">        
+        <div class="col-md-3">
+
+            @using (Html.BeginForm("Menu", "Appearance", FormMethod.Post, new {}))
+            {
+                @AntiForgery.GetHtml()
+                @Html.ValidationSummary(true)
+                <input type="hidden" name="mode" value="add-to-menu"/>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Pages</div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            @DisplayPageUl(Model.Pages)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Categories</div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            @DisplayMenuPost(Model.Categories)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Custom links</div>
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <p class="col-sm-2 control-label">URL</p>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" name="menu-item-url" value="http://"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <p class="col-sm-2 control-label">Text</p>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" name="menu-item-title" placeholder="Menu item"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group-btn">
+                    <span class="b">
+                        <input class="btn btn-primary" type="submit" name="add-to-menu-submit" value="Add to"/>
+                        @DisplayTermUl(Model.Menu)
+                    </span>
+                </div>
+                @Html.ValidationMessage("menu-name-group")
+            }
+            <br />
+        </div>
+        <div class="col-lg-9">
+            @using (Html.BeginForm("CreateMenu", "Appearance", FormMethod.Post, new { }))
+            {
+                @AntiForgery.GetHtml()
+                @Html.ValidationSummary(true)
+                <input type="hidden" name="mode" value="create-menu" />
+                <div class="form-group">
+                    <label for="menu-name">Menu name</label>
+                    <div class="input-group">
+                        <input id="menu-name" type="text" value="" name="menu-name" class="form-control" required />
+                        <div class="input-group-btn">
+                            <input class="btn btn-success" type="submit" name="menu-create-submit" value="Create Menu" />
+                        </div>
+                    </div>
+                    <p>
+                        <small><em>Give your menu a name above, then click Create Menu.</em></small>
+                    </p>
+                </div>
+                <table class="table table-hover fixed widefat">
+                    <thead>
+                    <tr>
+                        <td>Id</td>
+                        <td>Menu name</td>
+                        <td>Items</td>
+                        <td>Actions</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var menu in Model.Menu)
+                    {
+                        <tr>
+                            <td>@menu.Id</td>                            
+                            <td>
+                                <a href="@Url.Action("Menu", new {id = menu.Id})">@menu.Name</a>
+                            </td>                            
+                            <td></td>
+                            <td>
+                                <a href="@Url.Action("Menu", new {id = menu.Id})">Edit</a> |
+                                <a href="@Url.Action("DeleteMenu", new {id = menu.Id})">Delete</a>
+                            </td>                            
+                        </tr>
+                     
+                    }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+
+@helper DisplayTermUl(IEnumerable<Term> terms)
+{
+    <select name="menu-name-group" class="btn">
+        @foreach (var term in terms)
+        {
+            <option value="@term.Id"> @term.Name</option>
+        }
+    </select>
+}
+@helper DisplayPageUl(IEnumerable<Post> pages, IEnumerable<Post> pagesChild = null)
+{
+    <ul>
+        @foreach (var page in pages)
+        {
+            if (page.Parent == 0)
+            {
+                <li><input type="checkbox" name="menu-item-object" value="@page.Id" /> @page.Title</li>
+                @DisplayPageChildUl(page.Id, pagesChild, 1)
+            }
+        }
+    </ul>
+
+}
+
+@helper DisplayPageChildUl(decimal idParent, IEnumerable<Post> pagesChild, int level = 1)
+{
+    var rowPerfix = string.Empty;
+
+    if (pagesChild != null)
+    {
+        foreach (var page in pagesChild)
+        {
+            if (idParent == page.Parent)
+            {
+                for (int i = 0; i < level; i++)
+                {
+                    rowPerfix += "— ";
+                }
+                <li><input type="checkbox" name="menu-item-object" value="@page.Id"/> @rowPerfix@page.Title</li>
+                level++;
+                @DisplayPageChildUl((int) page.Id, pagesChild, level)
+                ;
+                level = level - 1;
+                rowPerfix = string.Empty;
+            }
+        }
+    }
+}
+
+
+@helper DisplayMenuPost(IEnumerable<Term> categories, IEnumerable<Term> list = null)
+{
+
+    <ul class="categorychecklist">
+        @for (var i = 0; i < Model.Categories.Count; i++)
+        {
+            var cat = Model.Categories[i];
+
+            if (cat.Parent == 0)
+            {
+                <li>
+                    @if (list != null)
+                    {
+                        string isChecked = string.Empty;
+                        var inList = list.FirstOrDefault(p => p.Parent == cat.Parent);
+                        if (inList != null) { isChecked = "checked"; }                        
+                        <input type="checkbox" name="categories" value="@cat.Id" @isChecked /> @cat.Name
+                    }
+                    else
+                    {
+                        <input type="checkbox" name="categories" value="@cat.Id" /> @cat.Name
+                    }
+
+                </li>
+                @DisplaySubMenuPost((int)cat.Id, categories, list, 1)
+
+            }
+
+        }
+    </ul>
+}
+
+@helper DisplaySubMenuPost(int id, IEnumerable<Term> categories, IEnumerable<Term> list, int level = 1)
+{
+    string rowPerfix = string.Empty;
+
+    for (var k = 0; k < Model.Categories.Count; k++)
+    {
+        var cat = Model.Categories[k];
+
+        if (id == cat.Parent)
+        {
+            for (int i = 0; i < level; i++)
+            {
+                rowPerfix += "— ";
+            }
+            <li data-level="@level">
+                @if (list != null)
+                {
+                    string isChecked = string.Empty;
+                    var inList = list.SingleOrDefault(p => p.Id == cat.Id);
+                    if (inList != null) { isChecked = "checked"; }                 
+                    <input type="checkbox" name="categories" value="@cat.Id" @isChecked /> @rowPerfix@cat.Name
+                }
+                else
+                {                    
+                    <input type="checkbox" name="categories" value="@cat.Id" /> @rowPerfix@cat.Name
+                }
+
+            </li>
+            level++;
+            //đệ qui
+            @DisplaySubMenuPost((int)cat.Id, categories, list, level);
+            level = level - 1;
+            rowPerfix = string.Empty;
+        }
+
+    }
+}

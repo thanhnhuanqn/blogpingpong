@@ -4,124 +4,136 @@
 @{
     ViewBag.Title = "Edit Posts";
 }
-<br/>
-<h1>Edit post</h1>
-<div class="row">
-    @using (Html.BeginForm())
-    {
-        @AntiForgery.GetHtml()
-        @Html.ValidationSummary(true)
-        @Html.Hidden("Id", Model.Id)
-        
-        <div class="col-md-9">            
-            @Html.ValidationSummary(true)
-            <div class="form-group">
-                @Html.LabelFor(f => f.Title)
-                @Html.TextBoxFor(f => f.Title, new { @class = "form-control" })
-            </div>        
-            <div class="form-group">
-                @Html.LabelFor(f => f.Slug)
-                @Html.TextBoxFor(f => f.Slug, new { @class = "form-control", data_slug = "#Title" })
-            </div>    
+<div class="wrap">    
+    <h1>Edit post</h1>
+    @Html.Partial("_FlashMessage")
+    <div class="row">
+        @using (Html.BeginForm())
+        {
+            @AntiForgery.GetHtml()
+            @Html.ValidationSummary()
+            @Html.Hidden("Id", Model.Id)
 
-            <div class="form-group">
-                @Html.LabelFor(f => f.Excerpt)
-                @Html.TextAreaFor(f => f.Excerpt, new { @class = "form-control" })
-            </div>
-                
-            <div class="form-group">
-                @Html.LabelFor(f => f.Content)
-                @Html.TextAreaFor(f => f.Content, new { @class = "form-control" })
-            </div>
-        
-
-            <div class="form-group">
-                @Html.LabelFor(f => f.Keyword)
-                @Html.TextBoxFor(f => f.Keyword, new { @class = "form-control" })
-            </div>
-
-            <div class="form-group ">
-                <label></label>
-                <div>
-                    <input class="btn btn-primary" type="submit" value="Update" />
-                    <a href="javascript: history.back(1)">or Cancel</a>
+            <div class="col-md-9">
+                @Html.ValidationSummary(true)
+                <div class="form-group">
+                    @Html.LabelFor(f => f.Title)
+                    @Html.TextBoxFor(f => f.Title, new { @class = "form-control" })
                 </div>
-            </div>
-        </div>
+                <div class="form-group">
+                    @Html.LabelFor(f => f.Slug)
+                    @Html.TextBoxFor(f => f.Slug, new { @class = "form-control", data_slug = "#Title" })
+                </div>
 
-        <div class="col-md-3">
-            <div class="accordion-container">
-                <h4>Publish</h4>
-                <div id="sticky-span">
-                    <input id="sticky" name="sticky" type="checkbox" value="sticky">
-                    <label for="sticky" class="selectit">Stick this post</label><br>
+                <div class="form-group">
+                    @Html.LabelFor(f => f.Excerpt)
+                    @Html.TextAreaFor(f => f.Excerpt, new { @class = "form-control" })
                 </div>
-                <div id="statusPost" class="form-group">
-                    <label for="post_status">Visibility</label>
-                    @SelectStatus(Model.Status)
+
+                <div class="form-group">
+                    @Html.LabelFor(f => f.Content)
+                    @Html.TextAreaFor(f => f.Content, new { @class = "form-control" })
                 </div>
-                <div id="visibilityPost" class="form-group">
-                    <label>Publish</label>
+
+
+                <div class="form-group">
+                    @Html.LabelFor(f => f.Keyword)
+                    @Html.TextBoxFor(f => f.Keyword, new { @class = "form-control" })
+                </div>
+
+                <div class="form-group ">
+                    <label></label>
                     <div>
-                        @DisplayMonth(Model.Month)
-                        <input type="text" value="@Model.Day" name="Day" style="width:20px;" />,
-                        <input type="text" value="@Model.Year" name="Year" style="width:35px;" /> @@
-                        <input type="text" value="@Model.Hour" name="Hour" style="width:20px;" /> :
-                        <input type="text" value="@Model.Minutes" name="Minutes" style="width:20px;" />
+                        <input class="btn btn-primary" type="submit" value="Update" />
+                        <a href="javascript: history.back(1)">or Cancel</a>
                     </div>
                 </div>
             </div>
-            <div class="accordion-container">
-                <div class="form-group">
-                    <h4>Categories</h4>
-                    @DisplayMenuPost(ViewBag.Category, Model.Category)
-                    @Html.ValidationMessage("Categories")
-                </div>
-            </div>
-            <div class="accordion-container">
-                <div class="form">
-                    <h4>Tags</h4>
-                    <input type="text" name="ctags" class="form-control" autocomplete="off" value="@String.Join(", ", Model.Category.Where(t=>t.Taxonomy=="tag").Select(t => t.Name))">
-                    <p class="description">Separate tags with commas</p>
-                </div>
-            </div>
 
-        </div>
-    }
+            <div class="col-md-3">
+                <div class="accordion-container">
+                    <h4>Publish</h4>
+                    <div id="sticky-span">
+                        @{
+                            var checkSticky = string.Empty;
+                            if (Model.Sticky != null)
+                            {
+                                if (Model.Sticky.Equals("sticky"))
+                                {
+                                    checkSticky = "checked=\"checked\"";
+                                }
+                            }
+                        }
+                        <input id="sticky" name="Sticky" value="sticky" type="checkbox" @checkSticky>
+                        <label for="sticky">Stick this post</label><br>
+                    </div>
+                    <div id="statusPost" class="form-group">
+                        <label for="post_status">Visibility</label>
+                        @SelectStatus(Model.Status)
+                    </div>
+                    <div id="visibilityPost" class="form-group">
+                        <label>Publish</label>
+                        <div>
+                            @DisplayMonth(Model.Month)
+                            <input type="text" value="@Model.Day" name="Day" style="width:20px;" />,
+                            <input type="text" value="@Model.Year" name="Year" style="width:35px;" /> @@
+                            <input type="text" value="@Model.Hour" name="Hour" style="width:20px;" /> :
+                            <input type="text" value="@Model.Minutes" name="Minutes" style="width:20px;" />
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-container">
+                    <div class="form-group">
+                        <h4>Categories</h4>
+                        @DisplayMenuPost(ViewBag.Category, Model.Category)
+                        @Html.ValidationMessage("Categories")
+                    </div>
+                </div>
+                <div class="accordion-container">
+                    <div class="form">
+                        <h4>Tags</h4>
+                        <input type="text" name="ctags" class="form-control" autocomplete="off" value="@String.Join(", ", Model.Category.Where(t=>t.Taxonomy=="tag").Select(t => t.Name))">
+                        <p class="description">Separate tags with commas</p>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
 </div>
 @section scripts{
-    @Scripts.Render("~/bundles/ckeditor")    
-    <script>
-        $(function () {
-            CKEDITOR.replace('Content', {
-                filebrowserWindowWidth: 800,
-                filebrowserWindowHeight: 600
+        @Scripts.Render("~/bundles/ckeditor")
+        <script>
+            $(function () {
+                CKEDITOR.replace('Content', {
+                    filebrowserWindowWidth: 800,
+                    filebrowserWindowHeight: 600
+                });
             });
-        });
-    </script>
-}
-
-@helper SelectStatus(string status = null)
-{
-    string publish = string.Empty;
-    string draft = string.Empty;
-    string pedding = string.Empty;
-
-    if (status != null)
-    {
-        if (status.Equals("publish"))
-        {
-            publish = "selected";
-        }
-        else if (status.Equals("draft"))
-        {
-            draft = "selected";
-        }
-        else if (status.Equals("pedding"))
-        {
-            pedding = "selected";
-        }
+        </script>
     }
+
+    @helper SelectStatus(string status = null)
+    {
+string publish = string.Empty;
+string draft = string.Empty;
+string pedding = string.Empty;
+
+if (status != null)
+{
+    if (status.Equals("publish"))
+    {
+        publish = "selected";
+    }
+    else if (status.Equals("draft"))
+    {
+        draft = "selected";
+    }
+    else if (status.Equals("pedding"))
+    {
+        pedding = "selected";
+    }
+}
     <select name="Status" class="form-control">
         <option @publish value="publish">Publish</option>
         <option @draft value="draft">Draft</option>
@@ -129,11 +141,11 @@
     </select>
 }
 
-@helper DisplayMonth(int monthEdit = 0, string classCss = "")
-{
-    var month = DateTime.Now.ToString("MM");
-    var selected = string.Empty;
-    var value = string.Empty;
+    @helper DisplayMonth(int monthEdit = 0, string classCss = "")
+    {
+var month = DateTime.Now.ToString("MM");
+var selected = string.Empty;
+var value = string.Empty;
     <select name="month" id="month" class="@classCss">
         @for (var i = 1; i <= 12; i++)
         {
@@ -186,12 +198,12 @@
 }
 
 
-@helper DisplayMenuPost(IEnumerable<Term> categories, IEnumerable<Term> list = null)
-{
+    @helper DisplayMenuPost(IEnumerable<Term> categories, IEnumerable<Term> list = null)
+    {
 
     <ul class="categorychecklist">
-        @foreach(var cat in categories)
-        {            
+        @foreach (var cat in categories)
+        {
             if (cat.Parent == 0)
             {
                 <li>
@@ -217,35 +229,35 @@
     </ul>
 }
 
-@helper DisplaySubMenuPost(int id, IEnumerable<Term> categories, IEnumerable<Term> list, int level = 1)
+    @helper DisplaySubMenuPost(int id, IEnumerable<Term> categories, IEnumerable<Term> list, int level = 1)
+    {
+string rowPerfix = string.Empty;
+
+foreach (var cat in categories)
 {
-    string rowPerfix = string.Empty;
-
-    foreach (var cat in categories)
-    {        
-        if (id == cat.Parent)
+    if (id == cat.Parent)
+    {
+        for (int i = 0; i < level; i++)
         {
-            for (int i = 0; i < level; i++)
+            rowPerfix += "— ";
+        }
+        <li data-level="@level">
+            @if (list != null)
             {
-                rowPerfix += "— ";
+                string isChecked = string.Empty;
+                var inList = list.Where(p => p.Id == cat.Id).SingleOrDefault();
+                if (inList != null) { isChecked = "checked"; }
+                <input type="checkbox" name="categories" value="@cat.Id" @isChecked /> @rowPerfix@cat.Name
             }
-            <li data-level="@level">
-                @if (list != null)
-                {
-                    string isChecked = string.Empty;
-                    var inList = list.Where(p => p.Id == cat.Id).SingleOrDefault();
-                    if (inList != null) { isChecked = "checked"; }                 
-                    <input type="checkbox" name="categories" value="@cat.Id" @isChecked /> @rowPerfix@cat.Name
-                }
-                else
-                {                    
-                    <input type="checkbox" name="categories" value="@cat.Id" /> @rowPerfix@cat.Name
-                }
+            else
+            {
+                <input type="checkbox" name="categories" value="@cat.Id" /> @rowPerfix@cat.Name
+            }
 
-            </li>
-            level++;
-            //đệ qui
-            @DisplaySubMenuPost((int)cat.Id, categories, list, level);
+        </li>
+        level++;
+        //đệ qui
+        @DisplaySubMenuPost((int)cat.Id, categories, list, level);
             level = level - 1;
             rowPerfix = string.Empty;
         }

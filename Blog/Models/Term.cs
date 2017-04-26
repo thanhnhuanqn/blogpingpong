@@ -46,7 +46,11 @@ namespace Blog.Models
                 x.Key(y => y.Column("term_id"));
                 x.Table("term_posts");
 
-            }, x => x.ManyToMany(y => y.Column("post_id")));
+            }, x => x.ManyToMany(y =>
+            {
+                y.Column("post_id");
+                y.NotFound(NotFoundMode.Ignore);
+            }));
         }
     }
 }

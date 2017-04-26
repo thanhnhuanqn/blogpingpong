@@ -14,6 +14,9 @@
             <li class="@SelectedTab("posts")">
                 @Html.ActionLink("Posts", "Index", "Posts", new { area = "Admin" }, new { })
             </li>
+            <li class="@SelectedTab("page")">
+                @Html.ActionLink("Pages", "Index", "Pages", new { area = "Admin" }, new { })
+            </li>
             <li class="@SelectedTab("users")">
                 @Html.ActionLink("Users", "Index", "Users", new { area = "Admin" }, new { })
             </li>
@@ -22,6 +25,12 @@
             </li>
             <li class="@SelectedTab("Tag")">
                 @Html.ActionLink("Tags", "Index", "Tags", new { area = "Admin" }, new { })
+            </li>
+            <li class="@SelectedTab("Media")">
+                @Html.ActionLink("Media", "Index", "Media", new { area = "Admin" }, new { })
+            </li>
+            <li class="@SelectedTab("Appearance")">
+                @Html.ActionLink("Appearance", "Index", "Appearance", new { area = "Admin" }, new { })
             </li>
 
             <li class="pull-right">

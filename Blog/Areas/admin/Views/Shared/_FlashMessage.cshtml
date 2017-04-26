@@ -1,0 +1,20 @@
+﻿
+@if (TempData["FlashSuccess"] != null)
+{
+    <div class="alert alert-success">@TempData["FlashSuccess"]</div>
+}
+
+@if (TempData["FlashInfo"] != null)
+{
+    <div class="alert alert-info">@TempData["FlashInfo"]</div>
+}
+
+@if (TempData["FlashDanger"] != null)
+{
+    <div class="alert alert-danger">@TempData["FlashDanger"]</div>
+}
+
+@if (TempData["FlashWarning"] != null)
+{
+    <div class="alert alert-warning">@TempData["FlashWarning"]</div>
+}

@@ -1,0 +1,26 @@
+﻿@using Paging
+@model Paging.IPagedList<Blog.Models.Post>
+@{
+    ViewBag.Title = "Index";
+}
+<div class="wrap">
+    <h2>Media</h2>
+    @Html.Partial("_FormUpload")
+    <div class="view-switch media-grid-view-switch">
+        <div class="pull-right">        
+            <a href="@Url.Action("", new {layout = "grid"})"><span class="screen-reader-text">Grid View</span></a>
+            <a href="@Url.Action("", new {layout = "list"})"><span class="screen-reader-text">List View</span></a>
+        </div>
+    </div>
+    @Html.Partial("_List", Model)   
+    <div class="pager">
+        @Html.Pager(Model.PageSize, Model.PageNumber, Model.TotalItemCount).Options(o => o
+            .DisplayTemplate("Bootstrap3Pagination")
+            .MaxNrOfPages(10)
+            .AlwaysAddFirstPageNumber()
+            .HidePreviousAndNextPage()
+            )
+    </div>
+</div>
+
+

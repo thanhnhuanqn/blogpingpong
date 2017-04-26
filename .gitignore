@@ -1,3 +1,4 @@
+Uploads
 bin
 obj
 *.suo
@@ -6,6 +7,7 @@ obj
 
 [Db]ebug/
 [Rr]elase/
+
 *.obj
 *.pdb
 

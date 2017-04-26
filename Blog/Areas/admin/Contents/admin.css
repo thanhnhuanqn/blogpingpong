@@ -1,4 +1,30 @@
-﻿body {
+﻿
+
+/* styles for validation helpers */
+.field-validation-error {
+    color: #e80c4d;
+    font-weight: bold;
+}
+
+.field-validation-valid {
+    display: none;
+}
+
+input.input-validation-error {
+    border: 1px solid #e80c4d;
+}
+
+input[type="checkbox"].input-validation-error {
+    border: 0 none;
+}
+
+.validation-summary-errors {
+    color: #e80c4d;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+body {
     background: #f1f1f1;
     color: #444;
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
@@ -143,4 +169,37 @@ ul.categorychecklist li {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+
+.block-inline-img {
+    display: inline-block;
+    padding-bottom: 5px;
+    margin: 5px;
+}
+
+.centered {
+    width: 100%;
+    height: 100%;
+    transform: translate(50%, 50%);
+}
+
+.centered img {
+    transform: translate(-50%, -50%);
+}
+
+.thumb {
+    overflow: hidden;
+    opacity: 1;
+    transition: opacity 0.1s ease 0s;
+    height: 134px;
+    width: 134px;
+}
+
+.postbox .inside h2, .wrap [class$=icon32]+h2, .wrap h1, .wrap>h2:first-child {
+    font-size: 23px;
+    font-weight: 400;
+    margin: 0;
+    padding: 9px 0 4px;
+    line-height: 29px;
 }

@@ -1,0 +1,16 @@
+﻿<div class="col-lg-12">
+    <form method="post" enctype="multipart/form-data">
+        @Html.ValidationSummary(true)
+        <div class="drag-drop">
+            <div id="drag-drop-area">
+                <div class="drag-drop-inside text-center">                                        
+                    <p>
+                        <input type="file" name="imageUpload" multiple />@Html.ValidationMessage("imageUpload")<br />
+                        <input type="submit" value="Upload Image" class="btn btn-primary" name="upload-submit" />
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>

@@ -1,0 +1,50 @@
+﻿@using Paging
+@model Paging.IPagedList<Blog.Models.Post>
+@{
+    ViewBag.Title = "Manager posts";
+}
+<div class="wrap">    
+    <div class="btn-toolbar">       
+        <br />
+        <div>
+            <table class="table table-hover widefat table-responsive fixed">
+                <thead>
+                    <tr>
+                        <th style="width: 3%" ><input id="cb-select-all-1" type="checkbox"></th>
+                        <th style="width: 60px"></th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th  style="width: 100px">Date</th>
+                        <th style="width: 30px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var cls = "";
+                        if (item.IsDeleted)
+                        {
+                            cls = "danger";
+                        }
+                        <tr class="@cls">
+                            <td><input id="checkbox-@item.Id" type="checkbox" /></td>
+                            <td>
+                                <a href="#@item.Id" title="Edit @item.Title">
+                                    <img src="~/uploads/thumb/@item.Guid" alt="@item.Title" height="60" />
+                                </a>
+                            </td>
+                            <td class="row-title"><a href="@Url.Action("edit", new {item.Id})">@item.Title</a></td>
+                            <td>@item.User.UserName</td>
+                            <td>@item.CreateAt</td>
+                            <td>
+                                <a href="@Url.Action("delete", new {item.Id})" class="btn btn-danger btn-xs" data-post="Are you sure you want to delete this post ?">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>           
+        </div>
+    </div>
+</div>

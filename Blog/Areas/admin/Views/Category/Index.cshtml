@@ -3,55 +3,58 @@
 @{
     ViewBag.Title = "Manager category";
 }
-<br />
-<div class="btn-toolbar">
-    <a href="@Url.Action("new")" class="btn btn-primary btn-sm">
-        <i class="glyphicon glyphicon-plus"></i> Create Category
-    </a>
-</div>
-<br/>
-<table class="table table-hover widefat table-responsive">
-    <tr>
-        <th class="check-column">
-            <input type="checkbox" name="actionDelete" value="all" id="select-all" />
-        </th>
-        <th>Name</th>
-        <th class="column-slug">Slug</th>
-        <th class="column-description">Description</th>
-        <th class="column-posts">Count</th>
-        <th>Actions</th>
-    </tr>
-    @foreach (var cat in Model.Category)
-    {
-        if (cat.Parent == 0)
-        {
-            @CategoriesSub(cat);
-            @DisplaySubMenuTable((int)cat.Id, Model.Category, 1)
+<div class="wrap">
+    <h1>Category</h1>
+    <div class="btn-toolbar">
+        <a href="@Url.Action("new")" class="btn btn-primary btn-sm">
+            <i class="glyphicon glyphicon-plus"></i> Create Category
+        </a>
+    </div>
+    <br />
+    <table class="table table-hover widefat table-responsive fixed">
+        <thead>
+            <tr>
+                <th class="check-column">
+                    <input type="checkbox" name="actionDelete" value="all" id="select-all" />
+                </th>
+                <th>Name</th>
+                <th class="column-slug">Slug</th>
+                <th class="column-description">Description</th>
+                <th class="column-posts">Count</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        @foreach (var cat in Model.Category)
+            {
+                if (cat.Parent == 0)
+                {
+                @CategoriesSub(cat);
+                @DisplaySubMenuTable((int)cat.Id, Model.Category, 1)
+            }
+
         }
-
-    }
-</table> 
-
+    </table>
+</div>
 @helper DisplaySubMenuTable(int id, IEnumerable<Term> categories, int level = 1)
 {
-    string rowPerfix = string.Empty;
+string rowPerfix = string.Empty;
 
-    foreach (var cat in categories)
+foreach (var cat in categories)
+{
+    if (cat.Parent != 0 && id == cat.Parent)
     {
-        if (cat.Parent != 0 && id == cat.Parent)
+        for (int i = 0; i < level; i++)
         {
-            for (int i = 0; i < level; i++)
-            {
-                rowPerfix += "— ";
-            }
-            @CategoriesSub(cat, level, rowPerfix);
-            level++;
-                @DisplaySubMenuTable((int)cat.Id, categories, level)
-            level = level - 1;
-            rowPerfix = string.Empty;
+            rowPerfix += "— ";
         }
-
+        @CategoriesSub(cat, level, rowPerfix);
+            level++;
+            @DisplaySubMenuTable((int)cat.Id, categories, level)
+        level = level - 1;
+        rowPerfix = string.Empty;
     }
+
+}
 }
 @helper CategoriesSub(Term cat, int level = 0, string rowPerfix = null)
 {
@@ -62,10 +65,10 @@
         <td>@cat.Description</td>
         <td>@cat.Count</td>
         <td>
-            <div class="btn-group"style="min-width: 111px;">
+            <div class="btn-group" style="min-width: 111px;">
                 <a href="@Url.Action("edit", new {cat.Id})" class="btn btn-xs btn-primary">
                     <i class="glyphicon glyphicon-edit"></i> Edit
-                </a>               
+                </a>
                 <a href="@Url.Action("Delete", new { cat.Id })" class="btn btn-xs btn-danger"
                    data-post="Are you sure you want to delete '@cat.Name'">
                     <i class="glyphicon glyphicon-remove"></i> Delete

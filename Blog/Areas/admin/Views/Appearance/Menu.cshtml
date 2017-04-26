@@ -1,0 +1,359 @@
+﻿@using Blog.Models
+@model Blog.Areas.admin.ViewModels.Nav
+
+@{
+    ViewBag.Title = "Edit Menu, ";
+}
+
+<div class="wrap">
+    <h1>Appearance</h1><br />
+    <div class="btn-toolbar">
+        <div class="btn-group btn-group-sm">
+            <a class="btn btn-primary" href="@Url.Action("Themes", "Appearance")">Themes</a>
+            <a class="btn btn-default" href="@Url.Action("Editor", "Appearance")">Editor</a>
+            <a class="btn btn-info" href="@Url.Action("Index", "Appearance")">Editor</a>
+        </div>
+    </div>
+    <br />
+    @Html.Partial("_FlashMessage")
+    <div class="row">
+        <div class="col-md-3">
+
+            @using (Html.BeginForm("AddToMenu", "Appearance", FormMethod.Post, new { }))
+            {
+                @AntiForgery.GetHtml()
+                @Html.ValidationSummary(true)
+                <input type="hidden" name="id" value="@Model.Id" />
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Pages</div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            @DisplayPageUl(Model.DataMenu.Pages)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Categories</div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            @DisplayMenuPost(Model.DataMenu.Categories)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Custom links</div>
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <p class="col-sm-2 control-label">URL</p>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" name="menu-item-url" value="http://" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <p class="col-sm-2 control-label">Text</p>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" name="menu-item-url-title" placeholder="Menu item" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group-btn">
+                    <span class="b">
+                        <input class="btn btn-primary" type="submit" name="add-to-menu-submit" value="Add to" />
+                        @DisplayTermUl(Model.DataMenu.Menu)
+                    </span>
+                </div>
+                @Html.ValidationMessage("menu-name-group")
+            }
+            <br />
+        </div>
+        <div class="col-lg-9">
+            @using (Html.BeginForm("UpdateItemsNav", "Appearance", FormMethod.Post, new { }))
+            {
+                <input type="hidden" name="id" value="@Model.Id" />
+                @AntiForgery.GetHtml()
+                @Html.ValidationSummary(true)
+                <h4>Edit menu →@Model.Name <span class="label label-info">@Model.NavItems.Count()</span></h4>
+                <table class="table table-bordered widefat">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Parent</th>
+                            <th>Original</th>
+                            <th>Order</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    
+                    @{
+                        var child = Model.NavItems.Where(t => t.Parent > 0).ToList();
+
+                        var posts = Database.Session.Load<Term>(Model.Id);
+                    }   
+                    @foreach (var item in posts.Posts)
+                    {
+
+                        if (item.Parent == 0)
+                        {
+                            <tr>
+                                <td>
+                                    <input type="hidden" value="@item.Id" name="menu-item-id"/>
+                                    <input type="text" class="input-sm" value="@item.Title" name="menu-item-name" required/>
+                                </td>
+                                <td>@DisplayNavItem(item, Model.NavItems)</td>
+                                <td>
+                                    @{
+                                        var firstOrDefault = item.PostMetas.FirstOrDefault(t => t.MetaKey == "_item_menu_cat_parent");
+                                    }
+                                    @if (firstOrDefault != null)
+                                    {
+                                        var page = Database.Session.Load<Post>(long.Parse(firstOrDefault.MetaValue));
+                                        if (page != null)
+                                        {
+                                            <a href="@Url.Action("Edit", "Pages", new {area = "admin", id = page.Id})">@page.Title</a>
+                                        }
+                                    }
+                                    @{
+                                        var cat = item.PostMetas.FirstOrDefault(t => t.MetaKey == "_item_menu_cat_parent");
+                                    }
+                                    @if (cat != null)
+                                    {
+                                        var category = Database.Session.Load<Term>(long.Parse(cat.MetaValue));
+                                        if (category != null)
+                                        {
+                                            <a href="@Url.Action("Edit", "Category", new {area = "admin", id = category.Id})">@category.Name</a>
+                                        }
+                                    }
+                                </td>
+                                <td><input class="input-sm" type="number" value="@item.MenuOrder" name="menu-item-order"/></td>
+                                <td><a class="btn btn-xs btn-warning" href="@Url.Action("DeleteMenuItem", new {id = item.Id})">Remove</a></td>
+                            </tr>
+                                            }
+                                            //nav_sub(child, item.Id, 1)
+
+                                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5">
+                                <input type="submit" value="Update Items" name="update-all-item" class="btn btn-success" />
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+                                            }
+        </div>
+    </div>
+</div>
+
+
+@helper nav_sub(List<Post> child, long id,  int level = 1)
+{    
+    
+    var rowPerfix = string.Empty;    
+
+    if (child != null)
+    {        
+        foreach (var item in child)
+        {
+            if (id == item.Parent)
+            {
+                for (var i = 0; i < level; i++)
+                {
+                    rowPerfix += "— ";
+                }
+                <tr>
+                    <td>
+                        <input type="hidden" value="@item.Id" name="menu-item-id" />
+                        @rowPerfix<input type="text" class="input-sm" value="@item.Title" name="menu-item-name" required />
+                    </td>
+                    <td>@DisplayNavItem(item, Model.NavItems)</td>
+                    <td>
+                        @{
+                            var firstOrDefault = item.PostMetas.FirstOrDefault(t => t.MetaKey == "_item_menu_post_parent");
+                        }
+                        @if (firstOrDefault != null)
+                        {
+                            var page = Database.Session.Load<Post>(long.Parse(firstOrDefault.MetaValue));
+                            if (page != null)
+                            {
+                                <a href="@Url.Action("Edit", "Pages", new { area = "admin", id = page.Id})">@page.Title</a>
+                            }
+                        }
+                        @{
+                            var cat = item.PostMetas.FirstOrDefault(t => t.MetaKey == "_item_menu_cat_parent");
+                        }
+                        @if (cat != null)
+                        {
+                            var category = Database.Session.Load<Term>(long.Parse(cat.MetaValue));
+                            if (category != null)
+                            {
+                                <a href="@Url.Action("Edit", "Category", new { area = "admin", id = category.Id})">@category.Name</a>
+                            }
+                        }
+                    </td>
+                    <td><input class="input-sm" type="number" value="@item.MenuOrder" name="menu-item-order" /></td>
+                    <td><a class="btn btn-xs btn-warning" href="@Url.Action("DeleteMenuItem", new {id=item.Id})">Remove</a></td>
+                </tr>
+                level++;
+                //đệ qui
+                @nav_sub(child, item.Id, level)
+                ;
+                level = level - 1; 
+                rowPerfix = string.Empty;
+          }
+       }
+    }
+}
+
+@helper DisplayNavItem(Post menuItem, IEnumerable<Post> items)
+{
+if (items != null)
+{
+        <select name="nav-item-parent">
+            <option value="0">None</option>
+            @foreach (var item in items)
+            {
+                if (item.Id != menuItem.Id)
+                {
+
+                    if (item.Id == menuItem.Parent)
+                    {
+                        <option value="@item.Id" selected>@item.Title</option>
+                    }
+                    else
+                    {
+                        <option value="@item.Id">@item.Title</option>
+                    }
+                }
+            }
+        </select>
+}
+}
+
+
+@helper DisplayTermUl(IEnumerable<Term> terms)
+{
+    <select name="menu-id-group" class="btn">
+        @foreach (var term in terms)
+        {
+            <option value="@term.Id"> @term.Name</option>
+        }
+    </select>
+}
+@helper DisplayPageUl(IEnumerable<Post> pages, IEnumerable<Post> pagesChild = null)
+{
+    <ul>
+        @foreach (var page in pages)
+        {
+            if (page.Parent == 0)
+            {
+                <li><input type="checkbox" name="menu-item-page" value="@page.Id" /> @page.Title</li>
+                @DisplayPageChildUl(page.Id, pagesChild, 1)
+            }
+        }
+    </ul>
+
+}
+
+@helper DisplayPageChildUl(decimal idParent, IEnumerable<Post> pagesChild, int level = 1)
+{
+var rowPerfix = string.Empty;
+
+if (pagesChild != null)
+{
+    foreach (var page in pagesChild)
+    {
+        if (idParent == page.Parent)
+        {
+            for (int i = 0; i < level; i++)
+            {
+                rowPerfix += "— ";
+            }
+            <li><input type="checkbox" name="menu-item-page" value="@page.Id" /> @rowPerfix@page.Title</li>
+            level++;
+                @DisplayPageChildUl((int)page.Id, pagesChild, level)
+            ;
+            level = level - 1;
+            rowPerfix = string.Empty;
+        }
+    }
+}
+}
+
+
+@helper DisplayMenuPost(IEnumerable<Term> categories, IEnumerable<Term> list = null)
+{
+
+    <ul class="categorychecklist">
+        @for (var i = 0; i < Model.DataMenu.Categories.Count; i++)
+        {
+            var cat = Model.DataMenu.Categories[i];
+
+            if (cat.Parent == 0)
+            {
+                <li>
+                    @if (list != null)
+                    {
+                        string isChecked = string.Empty;
+                        var inList = list.FirstOrDefault(p => p.Parent == cat.Parent);
+                        if (inList != null) { isChecked = "checked"; }
+                        <input type="checkbox" name="menu-item-cat" value="@cat.Id" @isChecked /> @cat.Name
+                    }
+                    else
+                    {
+                        <input type="checkbox" name="menu-item-cat" value="@cat.Id" /> @cat.Name
+                    }
+
+                </li>
+                @DisplaySubMenuPost((int)cat.Id, categories, list, 1)
+
+            }
+
+        }
+    </ul>
+}
+
+@helper DisplaySubMenuPost(int id, IEnumerable<Term> categories, IEnumerable<Term> list, int level = 1)
+{
+string rowPerfix = string.Empty;
+
+for (var k = 0; k < Model.DataMenu.Categories.Count; k++)
+{
+    var cat = Model.DataMenu.Categories[k];
+
+    if (id == cat.Parent)
+    {
+        for (int i = 0; i < level; i++)
+        {
+            rowPerfix += "— ";
+        }
+        <li data-level="@level">
+            @if (list != null)
+            {
+                string isChecked = string.Empty;
+                var inList = list.SingleOrDefault(p => p.Id == cat.Id);
+                if (inList != null) { isChecked = "checked"; }
+                <input type="checkbox" name="menu-item-cat" value="@cat.Id" @isChecked /> @rowPerfix@cat.Name
+            }
+            else
+            {
+                <input type="checkbox" name="menu-item-cat" value="@cat.Id" /> @rowPerfix@cat.Name
+            }
+
+        </li>
+        level++;
+        //đệ qui
+        @DisplaySubMenuPost((int)cat.Id, categories, list, level);
+            level = level - 1;
+            rowPerfix = string.Empty;
+        }
+
+    }
+}
