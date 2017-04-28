@@ -31,18 +31,13 @@
                 </thead>
                 <tbody>
                 @foreach (var item in Model)
-                {
-                    var cls = "";
-                    if (item.IsDeleted)
-                    {
-                        cls = "danger";
-                    }
-                    <tr class="@cls">
+                {                  
+                    <tr>
                         <td><input id="checkbox-@item.Id" type="checkbox"/></td>
                         <td class="row-title"><a href="@Url.Action("edit", new {item.Id})">@item.Title</a></td>
                         <td>@item.User.UserName</td>
-                        <td>@String.Join(", ", item.Category.Where(t=>t.Taxonomy=="cat").Select(t => t.Name))</td>
-                        <td>@String.Join(", ", item.Category.Where(t => t.Taxonomy == "tag").Select(t => t.Name))</td>
+                        <td>@string.Join(", ", item.Category.Where(t=>t.Taxonomy=="cat").Select(t => t.Name))</td>
+                        <td>@string.Join(", ", item.Category.Where(t => t.Taxonomy == "tag").Select(t => t.Name))</td>
                         <td>@item.CommentCount</td>
                         <td>@item.CreateAt</td>
                         <td>

@@ -18,6 +18,17 @@ namespace Blog.Areas.admin.Controllers
         
         private const int DefaultPageSize = 15;
 
+        public static bool CheckSlugUnique(long id, string slug)
+        {
+            var post = Database.Session.Query<Post>().Where(p => p.Slug == slug);
+
+            if (id <= 0) return post.Any();
+
+            post = Database.Session.Query<Post>().Where(p => p.Id != id && p.Slug == slug);
+
+            return post.Any();
+
+        }
 
         // GET: admin/Posts
         public ActionResult Index(int? page)
@@ -70,8 +81,9 @@ namespace Blog.Areas.admin.Controllers
                 Type = TypePost,
                 Status = form.Status,
                 CommentStatus = "open"
-            };            
-            
+            };
+            page.Slug = UniqueSlug.CreateSlug(CheckSlugUnique, page.Slug, page.Id);
+
             Database.Session.Save(page);
             return RedirectToAction("Index");
         }
@@ -138,6 +150,7 @@ namespace Blog.Areas.admin.Controllers
             page.Status = form.Status;
             page.CommentStatus = "open";
             page.Category = null;
+            page.Slug = UniqueSlug.CreateSlug(CheckSlugUnique, page.Slug, page.Id);
 
             Database.Session.Update(page);
             Database.Session.Flush();
@@ -153,9 +166,7 @@ namespace Blog.Areas.admin.Controllers
             var page = Database.Session.Load<Post>((Int64)id);
 
             if (page == null) return HttpNotFound();
-
-            page.DeleteAt = DateTime.Now;
-
+            
             Database.Session.Update(page);
 
             return RedirectToAction("Index");
@@ -171,20 +182,6 @@ namespace Blog.Areas.admin.Controllers
 
             Database.Session.Delete(page);
             Database.Session.Flush();
-            return RedirectToAction("Index");
-
-        }
-
-        [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Restore(int id)
-        {
-            var page = Database.Session.Load<Post>((Int64)id);
-
-            if (page == null) return HttpNotFound();
-
-            page.DeleteAt = null;
-            Database.Session.Update(page);
-
             return RedirectToAction("Index");
 
         }

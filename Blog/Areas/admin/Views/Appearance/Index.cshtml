@@ -109,8 +109,8 @@
                             </td>                            
                             <td></td>
                             <td>
-                                <a href="@Url.Action("Menu", new {id = menu.Id})">Edit</a> |
-                                <a href="@Url.Action("DeleteMenu", new {id = menu.Id})">Delete</a>
+                                <a href="@Url.Action("EditMenu", new {id = menu.Id})">Edit</a> |
+                                <a href="@Url.Action("DeleteMenu", new {id = menu.Id})"  data-post="Are you sure you want to delete '@menu.Name'">Delete</a>
                             </td>                            
                         </tr>
                      

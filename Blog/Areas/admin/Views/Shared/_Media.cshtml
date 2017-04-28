@@ -1,0 +1,37 @@
+﻿@model IEnumerable<Blog.Models.Post>
+
+<button type="button" class="btn-link" data-toggle="modal" data-target="#modal-1">Chọn ảnh đại diện</button>
+<div class="modal" id="modal-1" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Set Featured Image</h4>
+                <div class="modal-body FeaturedImage">
+                    <div class="text-center">
+
+                        @foreach (var image in Model)
+                        {
+                            <div class="block-inline-img" id="image-@image.Id">
+                                <div class="thumb">
+                                    <div class="centered">
+                                        <a href="#">
+                                            <img id="@image.Id" alt="@image.Guid" class="chooseimage" src="~/uploads/medium/@image.Guid" />
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <p class="pull-left text-success">Double click để chọn image</p>
+                    <a href="#" class="btn btn-default" data-dismiss="modal">Close</a>
+                    <a href="#" class="btn btn-primary" id="get_image_file_path">Choose image</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,4 +1,5 @@
 ﻿@using Blog.Models
+@using NHibernate.Linq
 @model Blog.Areas.admin.ViewModels.Nav
 
 @{
@@ -78,7 +79,7 @@
                 <input type="hidden" name="id" value="@Model.Id" />
                 @AntiForgery.GetHtml()
                 @Html.ValidationSummary(true)
-                <h4>Edit menu →@Model.Name <span class="label label-info">@Model.NavItems.Count()</span></h4>
+                <h4>Edit menu → @Model.Name <span class="label label-info">@Model.NavItems.Count()</span></h4>
                 <table class="table table-bordered widefat">
                     <thead>
                         <tr>
@@ -90,54 +91,65 @@
                         </tr>
                     </thead>
                     <tbody>
-                    
-                    @{
-                        var child = Model.NavItems.Where(t => t.Parent > 0).ToList();
 
-                        var posts = Database.Session.Load<Term>(Model.Id);
-                    }   
-                    @foreach (var item in posts.Posts)
-                    {
+                        @{
 
-                        if (item.Parent == 0)
+                            var posts = Database.Session.Load<Term>(Model.Id);
+                        }
+
+                        @if (posts != null)
                         {
-                            <tr>
-                                <td>
-                                    <input type="hidden" value="@item.Id" name="menu-item-id"/>
-                                    <input type="text" class="input-sm" value="@item.Title" name="menu-item-name" required/>
-                                </td>
-                                <td>@DisplayNavItem(item, Model.NavItems)</td>
-                                <td>
-                                    @{
-                                        var firstOrDefault = item.PostMetas.FirstOrDefault(t => t.MetaKey == "_item_menu_cat_parent");
-                                    }
-                                    @if (firstOrDefault != null)
-                                    {
-                                        var page = Database.Session.Load<Post>(long.Parse(firstOrDefault.MetaValue));
-                                        if (page != null)
-                                        {
-                                            <a href="@Url.Action("Edit", "Pages", new {area = "admin", id = page.Id})">@page.Title</a>
-                                        }
-                                    }
-                                    @{
-                                        var cat = item.PostMetas.FirstOrDefault(t => t.MetaKey == "_item_menu_cat_parent");
-                                    }
-                                    @if (cat != null)
-                                    {
-                                        var category = Database.Session.Load<Term>(long.Parse(cat.MetaValue));
-                                        if (category != null)
-                                        {
-                                            <a href="@Url.Action("Edit", "Category", new {area = "admin", id = category.Id})">@category.Name</a>
-                                        }
-                                    }
-                                </td>
-                                <td><input class="input-sm" type="number" value="@item.MenuOrder" name="menu-item-order"/></td>
-                                <td><a class="btn btn-xs btn-warning" href="@Url.Action("DeleteMenuItem", new {id = item.Id})">Remove</a></td>
-                            </tr>
+                            var child = posts.Posts.Where(t => t.Parent > 0).OrderBy(t => t.MenuOrder).ToList();
+
+                            foreach (var item in posts.Posts.Where(t => t.Parent == 0).OrderBy(t => t.MenuOrder))
+                            {
+                                <tr>
+                                    <td>
+                                        <input type="hidden" value="@item.Id" name="menu-item-id" />
+                                        <input type="text" class="input-sm" value="@item.Title" name="menu-item-name" required />
+                                    </td>
+                                    <td>@DisplayNavItem(item, Model.NavItems)</td>
+                                    <td>
+                                        @{
+                                            var metaKey = item.PostMetas.FirstOrDefault(t => t.MetaKey == "_item_menu_type" && t.PostId == item.Id);
+                                            var metaValue = item.PostMetas.FirstOrDefault(t => t.MetaKey == "_item_menu_post_parent" && t.PostId == item.Id);
+                                            if (metaValue != null && metaKey != null)
+                                            {
+                                                var id = Convert.ToInt64(metaValue.MetaValue);
+                                                if (metaKey.MetaValue.Equals("cat"))
+                                                {
+                                                    var cat = Model.DataMenu.Categories.FirstOrDefault(t => t.Id == id);
+                                                    if (cat != null)
+                                                    {
+                                                        <a href="@Url.Action("Edit", "Category", new {id = id})">
+                                                            @cat.Name
+                                                        </a>
+                                                    }
+                                                }
+                                                else if (metaKey.MetaValue.Equals("page"))
+                                                {
+                                                    var page = Database.Session.Query<Post>().FirstOrDefault(t => t.Id == item.Id);
+                                                    if (page != null)
+                                                    {
+                                                        <a href="@Url.Action("Edit", "Pages", new {id = id})">
+                                                            @page.Title
+                                                        </a>
+                                                    }
+                                                }
                                             }
-                                            //nav_sub(child, item.Id, 1)
 
                                         }
+                                    </td>
+                                    <td>
+                                        <input class="input-sm" type="number" value="@item.MenuOrder" name="menu-item-order" />
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-xs btn-warning" href="@Url.Action("DeleteMenuItem", new {id = item.Id+"-" + Model.Id})">Remove</a>
+                                    </td>
+                                </tr>
+                                @nav_sub(child, item.Id, 1)
+                                                }
+                                            }
                     </tbody>
                     <tfoot>
                         <tr>
@@ -153,63 +165,71 @@
 </div>
 
 
-@helper nav_sub(List<Post> child, long id,  int level = 1)
-{    
-    
-    var rowPerfix = string.Empty;    
+@helper nav_sub(List<Post> child, long id, int level = 1)
+{
 
-    if (child != null)
-    {        
-        foreach (var item in child)
+var rowPerfix = string.Empty;
+foreach (var item in child)
+{
+    if (id == item.Parent)
+    {
+        for (var i = 0; i < level; i++)
         {
-            if (id == item.Parent)
-            {
-                for (var i = 0; i < level; i++)
-                {
-                    rowPerfix += "— ";
-                }
-                <tr>
-                    <td>
-                        <input type="hidden" value="@item.Id" name="menu-item-id" />
-                        @rowPerfix<input type="text" class="input-sm" value="@item.Title" name="menu-item-name" required />
-                    </td>
-                    <td>@DisplayNavItem(item, Model.NavItems)</td>
-                    <td>
-                        @{
-                            var firstOrDefault = item.PostMetas.FirstOrDefault(t => t.MetaKey == "_item_menu_post_parent");
-                        }
-                        @if (firstOrDefault != null)
+            rowPerfix += "— ";
+        }
+        <tr>
+            <td>
+                <input type="hidden" value="@item.Id" name="menu-item-id" />
+                @rowPerfix<input type="text" class="input-sm" value="@item.Title" name="menu-item-name" required />
+            </td>
+            <td>@DisplayNavItem(item, Model.NavItems)</td>
+            <td>
+                @{
+                    var metaKey = item.PostMetas.FirstOrDefault(t => t.MetaKey == "_item_menu_type");
+                    var metaValue = item.PostMetas.FirstOrDefault(t => t.MetaKey == "_item_menu_post_parent");
+                    if (metaValue != null && metaKey != null)
+                    {
+                        var idMeta = Convert.ToInt64(metaValue.MetaValue);
+                        if (metaKey.MetaValue.Equals("cat"))
                         {
-                            var page = Database.Session.Load<Post>(long.Parse(firstOrDefault.MetaValue));
+                            var cat = Model.DataMenu.Categories.FirstOrDefault(t => t.Id == idMeta);
+                            if (cat != null)
+                            {
+                                <a href="@Url.Action("Edit", "Category", new {id = idMeta})">
+                                    @cat.Name
+                                </a>
+                            }
+                        }
+                        else if (metaKey.MetaValue.Equals("page"))
+                        {
+                            var page = Database.Session.Query<Post>().FirstOrDefault(t => t.Id == item.Id);                            
                             if (page != null)
                             {
-                                <a href="@Url.Action("Edit", "Pages", new { area = "admin", id = page.Id})">@page.Title</a>
+                                <a href="@Url.Action("Edit", "Pages", new {id = idMeta})">
+                                    @page.Title
+                                </a>
                             }
                         }
-                        @{
-                            var cat = item.PostMetas.FirstOrDefault(t => t.MetaKey == "_item_menu_cat_parent");
+
+
+
+                    }
+
+                }
+            </td>
+            <td><input class="input-sm" type="number" value="@item.MenuOrder" name="menu-item-order" /></td>
+            <td>
+                <a class="btn btn-xs btn-warning" href="@Url.Action("DeleteMenuItem", new {id = item.Id+"-" + Model.Id})">Remove</a>
+            </td>
+        </tr>
+                    level++;
+                    //đệ qui
+                    @nav_sub(child, item.Id, level)
+                            ;
+                            level = level - 1;
+                            rowPerfix = string.Empty;
                         }
-                        @if (cat != null)
-                        {
-                            var category = Database.Session.Load<Term>(long.Parse(cat.MetaValue));
-                            if (category != null)
-                            {
-                                <a href="@Url.Action("Edit", "Category", new { area = "admin", id = category.Id})">@category.Name</a>
-                            }
-                        }
-                    </td>
-                    <td><input class="input-sm" type="number" value="@item.MenuOrder" name="menu-item-order" /></td>
-                    <td><a class="btn btn-xs btn-warning" href="@Url.Action("DeleteMenuItem", new {id=item.Id})">Remove</a></td>
-                </tr>
-                level++;
-                //đệ qui
-                @nav_sub(child, item.Id, level)
-                ;
-                level = level - 1; 
-                rowPerfix = string.Empty;
-          }
-       }
-    }
+                    }
 }
 
 @helper DisplayNavItem(Post menuItem, IEnumerable<Post> items)

@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Blog.Infrastructure;
 using NHibernate.Bytecode.CodeDom;
 using NHibernate.Linq;
 using NHibernate.Mapping;
 using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
+using NHibernate.Util;
 
 namespace Blog.Models
 {
@@ -17,14 +19,14 @@ namespace Blog.Models
         Deleted
     }
     public class Post
-    {
+    {        
         public virtual long Id { get; set; }        
 
         public virtual User User { get; set; }
 
         public virtual string Title { get; set; }
 
-        public  virtual string Slug { get; set; }
+        public virtual string Slug { get; set; }
 
         public virtual string Excerpt { get; set; }
 
@@ -49,16 +51,14 @@ namespace Blog.Models
 
         public virtual DateTime CreateAt { get; set; }
         public virtual DateTime? UpdateAt { get; set; }
-        public virtual DateTime? DeleteAt { get; set; }
-
-        public virtual bool IsDeleted => DeleteAt != null;
-
+        
         public virtual IList<Term> Category { get; set; }        
         public virtual IList<PostMeta> PostMetas { get; set; }        
         public Post()
         {            
             Category = new List<Term>();
-            PostMetas = new List<PostMeta>();
+            PostMetas = new List<PostMeta>();            
+
         }
 
 
@@ -89,7 +89,8 @@ namespace Blog.Models
     public class PostMap : ClassMapping<Post>
     {
         public PostMap()
-        {
+        {            
+
             Table("posts");
 
             Id(x=>x.Id, x=>x.Generator(Generators.Identity));
@@ -99,8 +100,7 @@ namespace Blog.Models
                 x.Column("user_id");
                 x.NotNullable(true);
             });
-
-
+            
             Property(x=>x.Title, x=>x.NotNullable(true));
             Property(x=>x.Slug, x=>x.NotNullable(true));
             Property(x=>x.Excerpt, x=>x.NotNullable(false));
@@ -115,6 +115,12 @@ namespace Blog.Models
             {
                 x.Column("created_at");
                 x.NotNullable(true);
+            });
+
+            Property(x => x.UpdateAt, x =>
+            {
+                x.Column("updated_at");
+                x.NotNullable(false);
             });
 
             Property(x => x.CommentStatus, x =>
@@ -135,9 +141,7 @@ namespace Blog.Models
                 x.NotNullable(false);
             });
 
-            Property(x=>x.UpdateAt, x=>x.Column("updated_at"));
-            Property(x=>x.DeleteAt, x=>x.Column("deleted_at"));
-
+            Property(x=>x.UpdateAt, x=>x.Column("updated_at"));            
 
             Bag(x => x.Category, x =>
             {

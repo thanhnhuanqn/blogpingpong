@@ -1,4 +1,13 @@
 ﻿
+.FeaturedImage {
+    max-height: 600px;
+    overflow: auto;    
+    overflow-y: scroll;
+}
+
+.choose-image-border {
+    border: 8px solid red;
+}
 
 /* styles for validation helpers */
 .field-validation-error {

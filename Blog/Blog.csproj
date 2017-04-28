@@ -241,6 +241,7 @@
     <Compile Include="Infrastructure\SelectedTabAttribute.cs" />
     <Compile Include="Infrastructure\StringExtensions.cs" />
     <Compile Include="Infrastructure\TransactionFilter.cs" />
+    <Compile Include="Infrastructure\UniqueSlug.cs" />
     <Compile Include="Migrations\_001_TablesBlog.cs" />
     <Compile Include="Migrations\_002_PostMeta.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -1142,6 +1143,8 @@
     <Content Include="Areas\admin\Views\Shared\_FlashMessage.cshtml" />
     <Content Include="Areas\admin\Views\Appearance\Index.cshtml" />
     <Content Include="Areas\admin\Views\Appearance\Menu.cshtml" />
+    <Content Include="Areas\admin\Views\Appearance\EditMenu.cshtml" />
+    <Content Include="Areas\admin\Views\Shared\_Media.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />

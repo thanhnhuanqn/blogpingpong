@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.WebPages;
 using Blog.Areas.admin.ViewModels;
 using Blog.Infrastructure;
 using Blog.Models;
@@ -50,14 +51,69 @@ namespace Blog.Areas.admin.Controllers
             return RedirectToAction("Index");
         }
 
+        public ActionResult Menu(int id)
+        {
+            var menu = Database.Session.Load<Term>((long)id);
+
+            if (menu == null) return HttpNotFound();
+
+            return View(new Nav(menu));
+        }
+        public ActionResult EditMenu(int id)
+        {
+            var menu = Database.Session.Load<Term>((long)id);
+
+            if (menu == null) return HttpNotFound();
+
+            return View(menu);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public ActionResult EditMenu(int id, Term form)
+        {
+            var menu = Database.Session.Load<Term>((long)id);
+
+            if (menu == null) return HttpNotFound();
+
+            if (!ModelState.IsValid)
+            {                
+                return View(form);
+            }
+
+            menu.Name = form.Name;
+            menu.Slug = !string.IsNullOrEmpty(form.Slug) ? form.Slug.UrlFriendly() : form.Name.UrlFriendly();
+            menu.Description = form.Description;
+            menu.Parent = 0;
+
+            Database.Session.Update(menu);
+            Database.Session.Flush();
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public ActionResult DeleteMenu(int id)
+        {
+            var menu = Database.Session.Load<Term>((long)id);
+
+            if (menu == null) return HttpNotFound();
+
+            Database.Session.Delete(menu);
+            Database.Session.Flush();
+            return RedirectToAction("Index");
+
+        }
+
         public ActionResult Editor()
         {
             return null;
         }
 
-        public ActionResult DeleteMenuItem(int id)
+     
+        public ActionResult DeleteMenuItem(string id)
         {
-            var post = Database.Session.Load<Post>((long)id);
+            var ids = id.Split('-');
+            var post = Database.Session.Load<Post>(long.Parse(ids[0]));
 
             if (post == null) return HttpNotFound();
 
@@ -65,8 +121,9 @@ namespace Blog.Areas.admin.Controllers
             Database.Session.Flush();
 
             TempData["FlashSuccess"] = "Deleted success!";
-            return RedirectToAction("Index");
-
+            var idMenu = Request["idMenu"].AsInt();
+            
+            return RedirectToAction("Menu", new {id = long.Parse(ids[1])});
         }
 
         [HttpPost, ValidateAntiForgeryToken]
@@ -76,11 +133,19 @@ namespace Blog.Areas.admin.Controllers
 
             if (menu == null) return HttpNotFound();
 
-            var menuItemName = Request["menu-item-name"];
-            var menuItemOrder = Request["menu-item-order"];
-            var menuItemId = Request["menu-item-id"];
-            var navItemParent = Request["nav-item-parent"];
+            var menuItemName = Request["menu-item-name"] ?? "";
+            var menuItemOrder = Request["menu-item-order"] ?? "";
+            var menuItemId = Request["menu-item-id"] ?? "";
+            var navItemParent = Request["nav-item-parent"]??"";
 
+            if (string.IsNullOrEmpty(menuItemId) ||
+                string.IsNullOrEmpty(menuItemOrder) ||
+                string.IsNullOrEmpty(menuItemId) ||
+                string.IsNullOrEmpty(navItemParent))
+            {
+                TempData["FlashWarning"] = "No records updated";
+                return RedirectToAction("Menu", new { id = id });
+            }
             var ids = menuItemId.Split(',');
             var names = menuItemName.Split(',');
             var orders = menuItemOrder.Split(',');
@@ -102,7 +167,7 @@ namespace Blog.Areas.admin.Controllers
                 i++;
             }
 
-
+            TempData["FlashSuccess"] = "Updated success";
             return RedirectToAction("Menu", new {id = id});
         }
 
@@ -112,20 +177,8 @@ namespace Blog.Areas.admin.Controllers
             return null;
         }
 
-        public ActionResult Menu(int id)
-        {
-            var menu = Database.Session.Load<Term>((long) id);
-
-            if (menu == null) return HttpNotFound();
-
-            return View(new Nav(menu));
-        }
-        public ActionResult DeleteMenu(int id)
-        {
-            return null;
-        }
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult AddToMenu(int id, Appearence form)
+        public ActionResult AddToMenu(Appearence form, int id = 0)
         {
             var nav = Database.Session.Load<Term>((long)id);
             if (nav == null) return HttpNotFound();                                    
@@ -133,7 +186,7 @@ namespace Blog.Areas.admin.Controllers
             AddPageToMenu(Request["menu-item-page"], nav);
             AddCategoriesToMenu(Request["menu-item-cat"], nav);
             AddCustomLinkToMenu(Request["menu-item-url"], Request["menu-item-url-title"], nav);
-
+            
             return RedirectToAction("Menu", new {id = nav.Id});            
         }
 
@@ -166,13 +219,13 @@ namespace Blog.Areas.admin.Controllers
 
                 Database.Session.Save(page);
 
-                var pageItem = Database.Session.Query<Post>().FirstOrDefault(p => p.Slug == page.Slug);
+                var pageItem = Database.Session.Query<Post>().OrderByDescending(t => t.Id).FirstOrDefault();
 
                 if (pageItem == null) continue;
 
                 PostsController.AddCategoriesTagsPost(post: pageItem, listTag:null, categories: nav.Id.ToString());
                 pageItem.CreateKeyValue(pageItem.Id, "_item_menu_type", "page");                                        
-                pageItem.CreateKeyValue(pageItem.Id, "_item_menu_cat_parent", nav.Id.ToString());
+                pageItem.CreateKeyValue(pageItem.Id, "_item_menu_post_parent", pageMenu.Id.ToString());
             }                            
         }
 
@@ -207,13 +260,13 @@ namespace Blog.Areas.admin.Controllers
 
                 Database.Session.Save(page);
 
-                var pageItem = Database.Session.Query<Post>().FirstOrDefault(p => p.Slug == page.Slug);
+                var pageItem = Database.Session.Query<Post>().OrderByDescending(t => t.Id).FirstOrDefault();
 
                 if (pageItem == null) continue;
 
                 PostsController.AddCategoriesTagsPost(post: pageItem, listTag: null, categories: nav.Id.ToString());
                 pageItem.CreateKeyValue(pageItem.Id, "_item_menu_type", "cat");
-                pageItem.CreateKeyValue(pageItem.Id, "_item_menu_cat_parent", nav.Id.ToString());
+                pageItem.CreateKeyValue(pageItem.Id, "_item_menu_post_parent", catMenu.Id.ToString());
             }
         }
 
@@ -242,11 +295,12 @@ namespace Blog.Areas.admin.Controllers
                 };
 
                 Database.Session.Save(customLink);
-
-                var customItem = Database.Session.Query<Post>().FirstOrDefault(p => p.Slug == customLink.Slug);
+                
+                var customItem = Database.Session.Query<Post>().OrderByDescending(t => t.Id).FirstOrDefault();
 
                 if (customItem == null) continue;
-                                
+
+                PostsController.AddCategoriesTagsPost(post: customItem, listTag: null, categories: nav.Id.ToString());
                 customItem.CreateKeyValue(customItem.Id, "_item_menu_type", "link");
                 customItem.CreateKeyValue(customItem.Id, "_item_menu_url", customItem.Id.ToString());
             }

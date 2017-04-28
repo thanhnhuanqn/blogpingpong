@@ -1,4 +1,5 @@
 ﻿@using Blog.Models
+@using NHibernate.Linq
 @model Blog.Areas.admin.ViewModels.PostsForm
 
 @{
@@ -50,9 +51,9 @@
                 </div>
             </div>
 
-            <div class="col-md-3">
-                <div class="accordion-container">
-                    <h4>Publish</h4>
+            <div class="col-md-3" id="poststuff">
+                <div class="postbox">                    
+                    <h2 class="hndle">Publish</h2>
                     <div id="sticky-span">
                         @{
                             var checkSticky = string.Empty;
@@ -82,18 +83,40 @@
                         </div>
                     </div>
                 </div>
-                <div class="accordion-container">
-                    <div class="form-group">
-                        <h4>Categories</h4>
+                <div class="postbox">
+                    <div class="form-group">                        
+                        <h2 class="hndle">Categories</h2>
                         @DisplayMenuPost(ViewBag.Category, Model.Category)
                         @Html.ValidationMessage("Categories")
                     </div>
                 </div>
-                <div class="accordion-container">
-                    <div class="form">
-                        <h4>Tags</h4>
+                <div class="postbox">
+                    <div class="form-group">
+                        <h2 class="hndle">Tags</h2>
                         <input type="text" name="ctags" class="form-control" autocomplete="off" value="@String.Join(", ", Model.Category.Where(t=>t.Taxonomy=="tag").Select(t => t.Name))">
                         <p class="description">Separate tags with commas</p>
+                    </div>
+                </div>
+
+                <div class="postbox">
+                    <div class="form-group">
+                        <h2 class="hndle">Featured Image</h2>
+                        @{
+                            var meta = Database.Session.Query<PostMeta>().FirstOrDefault(t => t.PostId == Model.Id && t.MetaKey== "thumbnail_id");
+                            <div id="imageDaChon" class="thumbnail">
+                                @if (meta != null)
+                                {
+                                    var image = Database.Session.Load<Post>(long.Parse(meta.MetaValue));
+                                    if (image != null)
+                                    {
+                                        <img alt="@image.Title" src="/uploads/medium/@image.Guid" />
+                                        <input type="hidden" name="image-choose" value="@image.Id" />
+                                    }
+                                }
+
+                            </div>
+                        }
+                        @Html.Partial("_Media", Model.Images)
                     </div>
                 </div>
 
@@ -109,6 +132,40 @@
                     filebrowserWindowWidth: 800,
                     filebrowserWindowHeight: 600
                 });
+            });
+            $(function () {
+                $('.chooseimage').click(function (e) {
+                    e.preventDefault();
+                    $('div').removeClass('choose-image-border');
+
+                    $('img').removeClass('chon-hinh-nay');
+
+                    var id = "#image-" + $(this).attr("id");
+                    $(id).addClass("choose-image-border");
+                    $(this).addClass("chon-hinh-nay");
+                });
+
+                $('.chooseimage').dblclick(function (e) {
+                    e.preventDefault();
+                    var t = $('.chon-hinh-nay').attr("alt");
+                    var file = '<img alt = "' + t + '" src="/uploads/medium/' + t + '"/>';
+
+                    file += '<input type = "hidden" name="image-choose" value = "' + $('.chon-hinh-nay').attr("id") + '"/>';
+
+                    $('#imageDaChon').html(file);
+                });
+
+
+                $('#get_image_file_path').click(function (e) {
+                    e.preventDefault();
+                    var t = $('.chon-hinh-nay').attr("alt");
+                    var file = '<img alt = "' + t + '" src="/uploads/medium/' + t + '"/>';
+
+                    file += '<input type = "hidden" name="image-choose" value = "' + $('.chon-hinh-nay').attr("id") + '"/>';
+
+                    $('#imageDaChon').html(file);
+                });
+
             });
         </script>
     }

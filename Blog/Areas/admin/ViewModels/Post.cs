@@ -72,12 +72,15 @@ namespace Blog.Areas.admin.ViewModels
         public virtual IList<Term> Category { get; set; }
         public virtual IList<Term> Tags { get; set; }
 
+        public virtual IList<Post> Images { get; set; }
+
         public virtual string Sticky { get; set; }
 
         public PostsForm()
         {
-            Tags = new List<Term>();
-            Category = new List<Term>();            
+            Tags = Database.Session.Query<Term>().Where(t => t.Taxonomy == "tag").ToList();
+            Category = Database.Session.Query<Term>().Where(t => t.Taxonomy == "cat").ToList();
+            Images = Database.Session.Query<Post>().Where(t => t.Type == "image").ToList();
         }
 
 

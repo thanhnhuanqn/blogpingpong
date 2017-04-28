@@ -21,12 +21,8 @@
                 <tbody>
                     @foreach (var item in Model)
                     {
-                        var cls = "";
-                        if (item.IsDeleted)
-                        {
-                            cls = "danger";
-                        }
-                        <tr class="@cls">
+                       
+                        <tr>
                             <td><input id="checkbox-@item.Id" type="checkbox" /></td>
                             <td>
                                 <a href="#@item.Id" title="Edit @item.Title">

@@ -35,7 +35,8 @@ namespace Blog.Areas.admin.ViewModels
 
         public Nav(Term cat)
         {
-            NavItems = Database.Session.Query<Post>().Where(t => t.Type == "nav_menu_item" && t.Parent == Id).OrderBy(t => t.MenuOrder).ToList();
+            //NavItems = Database.Session.Query<Post>().Where(t => t.Type == "nav_menu_item" && t.Parent == Id).OrderBy(t => t.MenuOrder).ToList();
+            NavItems = cat.Posts.OrderBy(t => t.MenuOrder).ToList(); 
             DataMenu = new Appearence();
             Name = cat.Name;
             Id = cat.Id;

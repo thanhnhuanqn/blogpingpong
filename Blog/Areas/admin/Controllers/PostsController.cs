@@ -15,10 +15,21 @@ namespace Blog.Areas.admin.Controllers
     [SelectedTab("posts")]
     public class PostsController : Controller
     {
-        private string PostType = "post";
+        private const string PostType = "post";
 
         private const int DefaultPageSize = 15;
 
+        public static bool CheckSlugUnique(long id, string slug)
+        {
+            var post = Database.Session.Query<Post>().Where(p => p.Slug == slug);
+
+            if (id <= 0) return post.Any();
+
+            post = Database.Session.Query<Post>().Where(p => p.Id != id && p.Slug == slug);
+
+            return post.Any();
+
+        }
 
         // GET: admin/Posts
         public ActionResult Index(int? page)
@@ -36,9 +47,7 @@ namespace Blog.Areas.admin.Controllers
                 Month = DateTime.Now.Month,
                 Year = DateTime.Now.Year,
                 Hour = DateTime.Now.Hour,
-                Minutes = DateTime.Now.Minute,
-                Tags = Database.Session.Query<Term>().Where(t => t.Taxonomy == "tag").ToList(),
-                Category = Database.Session.Query<Term>().Where(t => t.Taxonomy == "cat").ToList()
+                Minutes = DateTime.Now.Minute                
             });
         }
 
@@ -73,8 +82,11 @@ namespace Blog.Areas.admin.Controllers
                             Description = "new tag add from post",
                             Count = 1
                         };
+
+                        newTag.Slug = UniqueSlug.CreateSlug(CheckSlugUnique, newTag.Slug, newTag.Id);
+
                         Database.Session.Save(newTag);
-                        var oldTag = Database.Session.Query<Term>().FirstOrDefault(x => x.Slug == newTag.Slug);
+                        var oldTag = Database.Session.Query<Term>().OrderByDescending(ta=>ta.Id).FirstOrDefault();
                         if (oldTag != null)
                         {
                             tags.Add(oldTag);
@@ -113,9 +125,7 @@ namespace Blog.Areas.admin.Controllers
                     Month = DateTime.Now.Month,
                     Year = DateTime.Now.Year,
                     Hour = DateTime.Now.Hour,
-                    Minutes = DateTime.Now.Minute,
-                    Tags = Database.Session.Query<Term>().Where(t => t.Taxonomy == "tag").ToList(),
-                    Category = Database.Session.Query<Term>().Where(t => t.Taxonomy == "cat").ToList()
+                    Minutes = DateTime.Now.Minute                    
                 });
             }
             
@@ -132,9 +142,10 @@ namespace Blog.Areas.admin.Controllers
                 CommentStatus = "open"
             };
 
+            post.Slug = UniqueSlug.CreateSlug(CheckSlugUnique, post.Slug, post.Id);
             Database.Session.Save(post);
 
-            var postNew = Database.Session.Query<Post>().FirstOrDefault(t => t.Slug == post.Slug);
+            var postNew = Database.Session.Query<Post>().OrderByDescending(t=>t.Id).FirstOrDefault();
 
             if (postNew == null) return RedirectToAction("Index");
 
@@ -144,6 +155,7 @@ namespace Blog.Areas.admin.Controllers
 
             post.CreateKeyValue(postNew.Id, "sticky", Request["Sticky"]);
             post.CreateKeyValue(postNew.Id, "keyword", Request["keyword"]);
+            post.CreateKeyValue(postNew.Id, "thumbnail_id", Request["image-choose"]);
                 
             AddCategoriesTagsPost(post, Request["ctags"], Request["categories"]);
 
@@ -201,7 +213,7 @@ namespace Blog.Areas.admin.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult Edit(int id, PostsForm form)
         {
-            var post = Database.Session.Load<Post>((Int64)id);
+            var post = Database.Session.Load<Post>((long)id);
 
 
             if (post == null) return HttpNotFound();
@@ -240,13 +252,16 @@ namespace Blog.Areas.admin.Controllers
             post.Type = PostType;
             post.Status = form.Status;
             post.CommentStatus = "open";
-            post.Category = null;            
+            post.Category = null;
+
+            post.Slug = UniqueSlug.CreateSlug(CheckSlugUnique, post.Slug, post.Id);
             Database.Session.Update(post);
 
             AddCategoriesTagsPost(post, Request["ctags"], Request["categories"]);
 
             post.CreateKeyValue(post.Id, "sticky", form.Sticky);
             post.CreateKeyValue(post.Id, "keyword", form.Keyword);
+            post.CreateKeyValue(post.Id, "thumbnail_id", Request["image-choose"]);
 
             TempData["FlashSuccess"] = "Updated success!";
             return RedirectToAction("Edit", new {id = id});
@@ -255,11 +270,9 @@ namespace Blog.Areas.admin.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult Trash(int id)
         {
-            var post = Database.Session.Load<Post>((Int64)id);
+            var post = Database.Session.Load<Post>((long)id);
 
-            if (post == null) return HttpNotFound();
-
-            post.DeleteAt = DateTime.Now;
+            if (post == null) return HttpNotFound();            
             Database.Session.Update(post);
 
             return RedirectToAction("Index");
@@ -269,7 +282,7 @@ namespace Blog.Areas.admin.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult Delete(int id)
         {
-            var post = Database.Session.Load<Post>((Int64)id);
+            var post = Database.Session.Load<Post>((long)id);
 
             if (post == null) return HttpNotFound();
 
@@ -284,11 +297,10 @@ namespace Blog.Areas.admin.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult Restore(int id)
         {
-            var post = Database.Session.Load<Post>((Int64)id);
+            var post = Database.Session.Load<Post>((long)id);
 
             if (post == null) return HttpNotFound();
-
-            post.DeleteAt = null;
+            
             Database.Session.Update(post);
 
             return RedirectToAction("Index");

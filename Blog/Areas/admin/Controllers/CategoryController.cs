@@ -13,6 +13,19 @@ namespace Blog.Areas.admin.Controllers
     [SelectedTab("Category")]
     public class CategoryController : Controller
     {
+
+        public bool CheckSlugUnique(long id, string slug)
+        {
+            var post = Database.Session.Query<Term>().Where(p => p.Slug == slug);
+
+            if (id <= 0) return post.Any();
+
+            post = Database.Session.Query<Term>().Where(p => p.Id != id && p.Slug == slug);
+
+            return post.Any();
+
+        }
+
         // GET: admin/Category
         public ActionResult Index()
         {
@@ -50,8 +63,8 @@ namespace Blog.Areas.admin.Controllers
             category.Taxonomy = "cat";
             category.Description = form.Description;
             category.Parent = form.Parent ;
-            category.Count = 0;            
-            
+            category.Count = 0;
+            category.Slug = UniqueSlug.CreateSlug(CheckSlugUnique, category.Slug, category.Id);
             Database.Session.Save(category);
             Database.Session.Flush();
 
@@ -90,7 +103,8 @@ namespace Blog.Areas.admin.Controllers
             category.Name = form.Name;
             category.Slug = !string.IsNullOrEmpty(form.Slug) ? form.Slug.UrlFriendly() : form.Name.UrlFriendly();
             category.Description = form.Description;
-            category.Parent = form.Parent;            
+            category.Parent = form.Parent;
+            category.Slug = UniqueSlug.CreateSlug(CheckSlugUnique, category.Slug, category.Id);
 
             Database.Session.Update(category);            
             Database.Session.Flush();
