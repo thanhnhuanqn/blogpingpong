@@ -1,12 +1,12 @@
 ﻿@using Blog.Models
 @model Blog.Areas.admin.ViewModels.CategoryIndex
 @{
-    ViewBag.Title = "Manager category";
+    ViewBag.Title = "Manager category product";
 }
 <div class="wrap">
-    <h1>Categories</h1>
+    <h1>Categories Product</h1>
     <div class="btn-toolbar">
-        <a href="@Url.Action("new")" class="btn btn-primary btn-sm">
+        <a href="@Url.Action("CategoryNew")" class="btn btn-primary btn-sm">
             <i class="glyphicon glyphicon-plus"></i> Create Category
         </a>
     </div>
@@ -60,16 +60,16 @@ foreach (var cat in categories)
 {
     <tr data-level="@level">
         <td class="check-column"><input type="checkbox" name="actionDelete" value="@cat.Slug" /> </td>
-        <td><a href="@Url.Action("edit", new {cat.Id})">@rowPerfix@cat.Name</a></td>
+        <td><a href="@Url.Action("CategoryEdit", new {cat.Id})">@rowPerfix@cat.Name</a></td>
         <td>@cat.Slug</td>
         <td>@cat.Description</td>
         <td>@cat.Count</td>
         <td>
             <div class="btn-group" style="min-width: 111px;">
-                <a href="@Url.Action("edit", new {cat.Id})" class="btn btn-xs btn-primary">
+                <a href="@Url.Action("CategoryEdit", new {cat.Id})" class="btn btn-xs btn-primary">
                     <i class="glyphicon glyphicon-edit"></i> Edit
                 </a>
-                <a href="@Url.Action("Delete", new { cat.Id })" class="btn btn-xs btn-danger"
+                <a href="@Url.Action("CategoryDelete", new { cat.Id })" class="btn btn-xs btn-danger"
                    data-post="Are you sure you want to delete '@cat.Name'">
                     <i class="glyphicon glyphicon-remove"></i> Delete
                 </a>

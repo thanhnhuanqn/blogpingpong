@@ -1,7 +1,12 @@
 ﻿@using Blog.Areas.admin.ViewModels
+@using Blog.Models
 @model Blog.Areas.admin.ViewModels.CategoryNew
+
+@{
+    ViewBag.Title = "Edit " + Model.Name;
+}
 <div class="wrap">
-<h1>New Category</h1>
+<h1>Edit Category</h1>
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
@@ -26,32 +31,30 @@
         @Html.LabelFor(f => f.Parent)
         @DisplayMenuSelect(Model)
     </div>
-       
-    <input type="submit" value="Create Category" class="btn btn-primary" />
-    <a href="@Url.Action("Index")">or Cancel</a>
 
+    <input type="submit" value="Edit Category" class="btn btn-primary" />
+    <a href="@Url.Action("Categories")">or Cancel</a>
 }
 </div>
-
 @helper DisplayMenuSelect(CategoryNew category)
 {    
     <select class="form-control" name="Parent">
         <option value="0">None</option>                
-        @foreach (var cat in category.Categories)
-        {
-            if (cat.Parent == 0)
+            @foreach (var cat in category.Categories)
             {
-                if (category.Parent == cat.Id)
+                if (cat.Parent == 0)
                 {
-                    <option value="@cat.Id" selected="selected">@cat.Name</option>
+                    if (category.Parent == cat.Id)
+                    {
+                        <option value="@cat.Id" selected="selected">@cat.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@cat.Id">@cat.Name</option>
+                    }
+                    @DisplaySubMenuSelect((int)cat.Id, category, 1)
                 }
-                else
-                {
-                    <option value="@cat.Id">@cat.Name</option>
-                }
-                @DisplaySubMenuSelect((int)cat.Id, category, 1)
-            }
-        }                
+            }                
     </select>        
 }
 
@@ -69,11 +72,11 @@
             }
             if (category.Parent == cat.Id)
             {
-                <option value="@cat.Id" selected="selected">@rowPerfix@cat.Name</option>
+                    <option value="@cat.Id" selected="selected">@rowPerfix@cat.Name</option>
             }
             else
             {
-                <option value="@cat.Id">@rowPerfix@cat.Name</option>
+                    <option value="@cat.Id">@rowPerfix@cat.Name</option>
             }
 
             level++;

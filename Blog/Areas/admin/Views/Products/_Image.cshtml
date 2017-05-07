@@ -1,8 +1,5 @@
 ﻿@model IEnumerable<Blog.Models.Post>
-
-<button type="button" class="btn-link" data-toggle="modal" data-target="#modal-image">Chọn ảnh đại diện</button>
-
-<div class="modal fade" id="modal-image" tabindex="-1" role="dialog">
+<div class="modal fade" id="modal-2" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -15,7 +12,7 @@
                             <div class="thumb">
                                 <div class="centered">
                                     <a href="#">
-                                        <img id="@image.Id" alt="@image.Guid" class="chooseimage" src="~/uploads/Thumb/@image.Guid" />
+                                        <img id="@image.Id" alt="@image.Guid" class="attachment-image" src="~/uploads/Thumb/@image.Guid" />
                                     </a>
                                 </div>
                             </div>

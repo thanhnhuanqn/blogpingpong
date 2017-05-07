@@ -4,65 +4,66 @@
 @{
     ViewBag.Title = "New Page";
 }
-<br/>
-<div class="row">
-    @using (Html.BeginForm()) { 
-        @AntiForgery.GetHtml()
-        @Html.ValidationSummary(true)
-        <div class="col-md-9">
-            <div class="form-group">
-                @Html.LabelFor(f => f.Title)
-                @Html.TextBoxFor(f => f.Title, new { @class = "form-control" })
-            </div>        
-            <div class="form-group">
-                @Html.LabelFor(f => f.Slug)
-                @Html.TextBoxFor(f => f.Slug, new { @class = "form-control", data_slug = "#Title" })
-            </div>    
+<div class="wrap">
+    <div class="row">
+        @using (Html.BeginForm()) { 
+            @AntiForgery.GetHtml()
+            @Html.ValidationSummary(true)
+            <div class="col-md-9">
+                <div class="form-group">
+                    @Html.LabelFor(f => f.Title)
+                    @Html.TextBoxFor(f => f.Title, new { @class = "form-control" })
+                </div>        
+                <div class="form-group">
+                    @Html.LabelFor(f => f.Slug)
+                    @Html.TextBoxFor(f => f.Slug, new { @class = "form-control", data_slug = "#Title" })
+                </div>    
 
-            <div class="form-group">
-                @Html.LabelFor(f => f.Excerpt)
-                @Html.TextAreaFor(f => f.Excerpt, new { @class = "form-control" })
-            </div>
+                <div class="form-group">
+                    @Html.LabelFor(f => f.Excerpt)
+                    @Html.TextAreaFor(f => f.Excerpt, new { @class = "form-control" })
+                </div>
                 
-            <div class="form-group">
-                @Html.LabelFor(f => f.Content)
-                @Html.TextAreaFor(f => f.Content, new { @class = "form-control" })
-            </div>
+                <div class="form-group">
+                    @Html.LabelFor(f => f.Content)
+                    @Html.TextAreaFor(f => f.Content, new { @class = "form-control" })
+                </div>
         
 
-            <div class="form-group">
-                @Html.LabelFor(f => f.Keyword)
-                @Html.TextBoxFor(f => f.Keyword, new { @class = "form-control" })
-            </div>
-
-            <div class="form-group ">
-                <label></label>
-                <div>
-                    <input class="btn btn-primary" type="submit" value="Create" />
-                    <a href="javascript: history.back(1)">or Cancel</a>
+                <div class="form-group">
+                    @Html.LabelFor(f => f.Keyword)
+                    @Html.TextBoxFor(f => f.Keyword, new { @class = "form-control" })
                 </div>
-            </div>
-        </div>
 
-        <div class="col-md-3" id="poststuff">
-            <div class="postbox">
-                <h2 class="hndle">Publish</h2>
-                <div id="statusPost" class="form-group">                    
-                    @SelectStatus()
-                </div>
-                <div id="visibilityPost" class="form-group">
-                    <label>Date publish</label>
+                <div class="form-group ">
+                    <label></label>
                     <div>
-                        @DisplayMonth(Model.Month)
-                        <input type="text" value="@Model.Day" name="Day" style="width:20px;" />,
-                        <input type="text" value="@Model.Year" name="Year" style="width:35px;" /> @@
-                        <input type="text" value="@Model.Hour" name="Hour" style="width:20px;" /> :
-                        <input type="text" value="@Model.Minutes" name="Minutes" style="width:20px;" />
+                        <input class="btn btn-primary" type="submit" value="Create" />
+                        <a href="javascript: history.back(1)">or Cancel</a>
                     </div>
                 </div>
-            </div>            
-        </div>
-    }
+            </div>
+
+            <div class="col-md-3" id="poststuff">
+                <div class="postbox">
+                    <h2 class="hndle">Publish</h2>
+                    <div id="statusPost" class="form-group">                    
+                        @SelectStatus()
+                    </div>
+                    <div id="visibilityPost" class="form-group">
+                        <label>Date publish</label>
+                        <div>
+                            @DisplayMonth(Model.Month)
+                            <input type="text" value="@Model.Day" name="Day" style="width:20px;" />,
+                            <input type="text" value="@Model.Year" name="Year" style="width:35px;" /> @@
+                            <input type="text" value="@Model.Hour" name="Hour" style="width:20px;" /> :
+                            <input type="text" value="@Model.Minutes" name="Minutes" style="width:20px;" />
+                        </div>
+                    </div>
+                </div>            
+            </div>
+        }
+    </div>
 </div>
 @section scripts{
     @Scripts.Render("~/bundles/ckeditor")    

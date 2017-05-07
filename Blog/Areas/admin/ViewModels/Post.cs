@@ -23,6 +23,10 @@ namespace Blog.Areas.admin.ViewModels
     {
         public IPagedList<Post> Posts { get; set; }
     }
+    public class PostsIndex
+    {
+        public PageData<Post> Posts { get; set; }
+    }
     public class PostsForm
     {        
         public int Day { get; set; }
@@ -31,11 +35,11 @@ namespace Blog.Areas.admin.ViewModels
         public int Hour { get; set; }
         public int Minutes { get; set; }
 
-        public virtual Int64 Id { get; set; }
+        public virtual long Id { get; set; }
 
         public virtual User User { get; set; }
 
-        [Required, MaxLength(255)]
+        [Required(ErrorMessage = "Title cannot empty"), MaxLength(255)]
         public virtual string Title { get; set; }
 
         public virtual string Slug { get; set; }
@@ -45,7 +49,7 @@ namespace Blog.Areas.admin.ViewModels
         public virtual string Excerpt { get; set; }
 
 
-        [Required, DataType(DataType.MultilineText), AllowHtml]
+        [Required(ErrorMessage = "Content cannot empty"), DataType(DataType.MultilineText), AllowHtml]
         public virtual string Content { get; set; }
 
         public virtual string Status { get; set; }

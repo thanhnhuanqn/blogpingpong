@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Mvc;
+using Blog.Areas.admin.ViewModels;
 using Blog.Infrastructure;
 using Blog.Models;
 using CKFinder.Connector;
@@ -16,35 +17,43 @@ namespace Blog.Areas.admin.Controllers
     [SelectedTab("Media")]
     public class MediaController : Controller
     {
-        private string PostType = "Image";
-        private const int DefaultPageSize = 15;
+        private string PostType = "Image";        
+        private const int PostsPerPage = 15;
 
         // GET: admin/Media
-        public ActionResult Index(int? page)
-        {
-            int currentPageIndex = page.HasValue ? page.Value - 1 : 0;
-
-            try
+        public ActionResult Index(int page = 1)
+        {          
+            var files = Request.Files;
+            if (files != null)
             {
-                var files = Request.Files;
-                if (files != null)
-                {
-                    UploadMedia(files);
-                }
-
-                var listItem = Request["actionDelete"];
-
-                if (listItem != null)
-                {
-                    DeleteListImage(listItem);
-                }
-
-            }
-            catch (Exception ex)
-            {
+                UploadMedia(files);
             }
 
-            return View(Database.Session.Query<Post>().Where(p => p.Type == PostType).OrderByDescending(t => t.CreateAt).ToPagedList(currentPageIndex, DefaultPageSize));
+            var listItem = Request["actionDelete"];
+
+            if (listItem != null)
+            {
+                DeleteListImage(listItem);
+            }
+
+            var baseQuery = Database.Session.Query<Post>().Where(t=>t.Type== PostType).OrderByDescending(c => c.CreateAt);
+
+            var totalPostCount = baseQuery.Count();
+
+            var postIds = baseQuery
+                .Skip((page - 1) * PostsPerPage)
+                .Take(PostsPerPage)
+                .Select(p => p.Id)
+                .ToArray();
+
+            var currentPostPage = baseQuery
+                .Where(p => postIds.Contains(p.Id))                
+                .ToList();
+
+            return View(new PostsIndex
+            {
+                Posts = new PageData<Post>(currentPostPage, totalPostCount, page, PostsPerPage)
+            });
 
         }
 
@@ -110,11 +119,12 @@ namespace Blog.Areas.admin.Controllers
                 }
             }
         }
-
+        private readonly string folderUpload = @"~\Uploads\";
         public void UploadMedia(dynamic numFiles)
         {
             var imageFileName = "";
-                        
+
+            
             for (int i = 0; i < numFiles.Count; i++)
             {
                 var file = numFiles[i];
@@ -124,40 +134,36 @@ namespace Blog.Areas.admin.Controllers
 
                     var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(file.FileName);
                     if (fileNameWithoutExtension != null)
-                        imageFileName = Guid.NewGuid().ToString() + "_" +
+                        imageFileName = Guid.NewGuid() + "_" +
                                         fileNameWithoutExtension.Trim();
 
-                    originalImage.Save(@"~\Uploads\" + imageFileName.UrlFriendly());
-
+                    
+                    originalImage.Save(folderUpload + imageFileName.UrlFriendly());
+                    
                     var extension = Path.GetExtension(originalImage.FileName);
-                    if (extension != null)
-                    {
-                        var path = imageFileName + extension.Trim();
-                        var nameWithoutExtension = Path.GetFileNameWithoutExtension(file.FileName);
-                        if (nameWithoutExtension != null)
-                        {
-                            var fileTitle = nameWithoutExtension.Trim();
 
-                            var image = new Post
-                            {
-                                User = Database.Session.Load<User>(1),
-                                Title = fileTitle,
-                                Slug = imageFileName,                                
-                                Content = "Image upload",
-                                Status = "inherit",
-                                Type = PostType,
-                                CreateAt = DateTime.Now,
-                                UpdateAt = DateTime.Now,
-                                Guid = path,
-                                CommentStatus = "Open",                                
-                            };
-                            Database.Session.Save(image);
-                        }
-                        //Thumbs
-                        CreateImage(300, 300, file_name: path, folderSaveFile: @"~\Uploads\Thumb\");
-                        CreateImage(600, 600, file_name: path, folderSaveFile: @"~\Uploads\Medium\");
-                        CreateImage(1024, 768, file_name: path, folderSaveFile: @"~\Uploads\Large\");
-                    }
+                    if (extension == null || fileNameWithoutExtension == null) continue;
+
+                    var imageFile = imageFileName.UrlFriendly() + extension;
+
+                    var image = new Post
+                    {
+                        User = Database.Session.Load<User>(1),
+                        Title = fileNameWithoutExtension,
+                        Slug = imageFileName,                                
+                        Content = "Image upload",
+                        Status = "inherit",
+                        Type = PostType,
+                        CreateAt = DateTime.Now,
+                        UpdateAt = DateTime.Now,
+                        Guid = imageFile,
+                        CommentStatus = "Open",                                
+                    };
+                    Database.Session.Save(image);
+                    //Thumbs
+                    CreateImage(300, 300, file_name: imageFile, folderSaveFile: @"~\Uploads\Thumb\");
+                    CreateImage(600, 600, file_name: imageFile, folderSaveFile: @"~\Uploads\Medium\");
+                    CreateImage(1024, 768, file_name: imageFile, folderSaveFile: @"~\Uploads\Large\");
                 }
             }
 

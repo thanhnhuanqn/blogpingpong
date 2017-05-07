@@ -20,9 +20,9 @@ namespace Blog.Areas.admin.ViewModels
     {
         public IList<Term> Categories;
 
-        public Int64 Id { get; set; }
+        public long Id { get; set; }
 
-        [Required, MaxLength(200)]
+        [Required(ErrorMessage = "Name cannot empty"), MaxLength(200)]
         public string Name { get; set; }
         [MaxLength(200)]
         public string Slug { get; set; }
@@ -30,7 +30,7 @@ namespace Blog.Areas.admin.ViewModels
         public string Taxonomy { get; set; }
         public string Description { get; set; }
 
-        public Int64 Parent { get; set; }
+        public long Parent { get; set; }
         public CategoryNew()
         {
             Categories = new List<Term>();

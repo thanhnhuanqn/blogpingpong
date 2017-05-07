@@ -12,7 +12,7 @@ using Paging;
 
 namespace Blog.Areas.admin.Controllers
 {
-    [SelectedTab("posts")]
+    [SelectedTab("Posts")]
     public class PostsController : Controller
     {
         private const string PostType = "post";
@@ -99,7 +99,13 @@ namespace Blog.Areas.admin.Controllers
                 var listCategories = categories.Split(',').Where(t => t != string.Empty).Distinct().ToArray();
 
                 //var catList = listCategories.Select(category => Database.Session.Load<Term>(long.Parse(category))).Where(cat => cat != null).ToList();
-                tags.AddRange(from category in listCategories where category != null select Database.Session.Load<Term>(Convert.ToInt64(category)) into cat where cat != null select cat);
+                //tags.AddRange(from category in listCategories where category != null select Database.Session.Load<Term>(Convert.ToInt64(category)) into cat where cat != null select cat);
+                foreach (var cat in listCategories)
+                {
+                    var category = Database.Session.Query<Term>().FirstOrDefault(t => t.Id == long.Parse(cat));
+
+                    if (category != null) tags.Add(category);
+                }
             }
 
             post.Category = tags;
@@ -131,6 +137,7 @@ namespace Blog.Areas.admin.Controllers
             
             var post = new Post
             {
+                Id = 0,
                 CreateAt = new DateTime(form.Year, form.Month, form.Day, form.Hour, form.Minutes, 0, 0),
                 User = Database.Session.Load<User>(1),
                 Title = form.Title,
@@ -147,9 +154,7 @@ namespace Blog.Areas.admin.Controllers
 
             var postNew = Database.Session.Query<Post>().OrderByDescending(t=>t.Id).FirstOrDefault();
 
-            if (postNew == null) return RedirectToAction("Index");
-
-            post.Id = postNew.Id;
+            if (postNew == null) return RedirectToAction("Index");            
 
             post.Category = new List<Term>();
 
@@ -157,7 +162,7 @@ namespace Blog.Areas.admin.Controllers
             post.CreateKeyValue(postNew.Id, "keyword", Request["keyword"]);
             post.CreateKeyValue(postNew.Id, "thumbnail_id", Request["image-choose"]);
                 
-            AddCategoriesTagsPost(post, Request["ctags"], Request["categories"]);
+            AddCategoriesTagsPost(postNew, Request["ctags"], Request["categories"]);
 
             TempData["FlashSuccess"] = "Created success!";
 
@@ -166,7 +171,7 @@ namespace Blog.Areas.admin.Controllers
 
 
 
-        public ActionResult Edit(int id)
+        public ActionResult Edit(long id)
         {
             //var post = Database.Session.Load<Post>((Int64)id);
             var post = Database.Session.Query<Post>().SingleOrDefault(t => t.Id == id);
@@ -211,9 +216,9 @@ namespace Blog.Areas.admin.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, PostsForm form)
+        public ActionResult Edit(long id, PostsForm form)
         {
-            var post = Database.Session.Load<Post>((long)id);
+            var post = Database.Session.Load<Post>(id);
 
 
             if (post == null) return HttpNotFound();
@@ -268,9 +273,9 @@ namespace Blog.Areas.admin.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Trash(int id)
+        public ActionResult Trash(long id)
         {
-            var post = Database.Session.Load<Post>((long)id);
+            var post = Database.Session.Load<Post>(id);
 
             if (post == null) return HttpNotFound();            
             Database.Session.Update(post);
@@ -280,9 +285,9 @@ namespace Blog.Areas.admin.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Delete(int id)
+        public ActionResult Delete(long id)
         {
-            var post = Database.Session.Load<Post>((long)id);
+            var post = Database.Session.Load<Post>(id);
 
             if (post == null) return HttpNotFound();
 
@@ -295,9 +300,9 @@ namespace Blog.Areas.admin.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Restore(int id)
+        public ActionResult Restore(long id)
         {
-            var post = Database.Session.Load<Post>((long)id);
+            var post = Database.Session.Load<Post>(id);
 
             if (post == null) return HttpNotFound();
             

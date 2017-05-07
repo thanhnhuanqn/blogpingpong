@@ -224,11 +224,13 @@
     <Compile Include="Areas\admin\Controllers\MediaController.cs" />
     <Compile Include="Areas\admin\Controllers\PagesController.cs" />
     <Compile Include="Areas\admin\Controllers\PostsController.cs" />
+    <Compile Include="Areas\admin\Controllers\ProductsController.cs" />
     <Compile Include="Areas\admin\Controllers\TagsController.cs" />
     <Compile Include="Areas\admin\Controllers\UsersController.cs" />
     <Compile Include="Areas\admin\ViewModels\Appearence.cs" />
     <Compile Include="Areas\admin\ViewModels\Category.cs" />
     <Compile Include="Areas\admin\ViewModels\Post.cs" />
+    <Compile Include="Areas\admin\ViewModels\Product.cs" />
     <Compile Include="Areas\admin\ViewModels\Users.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -237,6 +239,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\PageData.cs" />
     <Compile Include="Infrastructure\RoleProvider.cs" />
     <Compile Include="Infrastructure\SelectedTabAttribute.cs" />
     <Compile Include="Infrastructure\StringExtensions.cs" />
@@ -1145,6 +1148,18 @@
     <Content Include="Areas\admin\Views\Appearance\Menu.cshtml" />
     <Content Include="Areas\admin\Views\Appearance\EditMenu.cshtml" />
     <Content Include="Areas\admin\Views\Shared\_Media.cshtml" />
+    <Content Include="Areas\admin\Views\Products\Categories.cshtml" />
+    <Content Include="Areas\admin\Views\Products\_Toolbar.cshtml" />
+    <Content Include="Areas\admin\Views\Products\AddProduct.cshtml" />
+    <Content Include="Areas\admin\Views\Products\Tags.cshtml" />
+    <Content Include="Areas\admin\Views\Products\TagNew.cshtml" />
+    <Content Include="Areas\admin\Views\Products\TagEdit.cshtml" />
+    <Content Include="Areas\admin\Views\Products\CategoryNew.cshtml" />
+    <Content Include="Areas\admin\Views\Products\CategoryEdit.cshtml" />
+    <Content Include="Areas\admin\Views\Products\Index.cshtml" />
+    <Content Include="Areas\admin\Views\Products\_Image.cshtml" />
+    <Content Include="Areas\admin\Views\Media\_Image.cshtml" />
+    <None Include="Properties\PublishProfiles\pingpongcode.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />

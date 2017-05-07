@@ -1,0 +1,19 @@
+﻿@model Blog.Models.Post
+
+<tr>
+    <td><input id="checkbox-@Model.Id" type="checkbox" /></td>
+    <td>
+        <a href="#@Model.Id" title="Edit @Model.Title">
+            <img src="~/uploads/thumb/@Model.Guid" alt="@Model.Title" height="60" />
+        </a>
+    </td>
+    <td class="row-title"><a href="@Url.Action("edit", new {Model.Id})">@Model.Title</a></td>
+    <td>@Model.User.UserName</td>
+    <td>@Model.CreateAt</td>
+    <td>
+        <a href="@Url.Action("delete", new {Model.Id})" class="btn btn-danger btn-xs" data-post="Are you sure you want to delete this post ?">
+            <i class="glyphicon glyphicon-remove"></i>
+        </a>
+    </td>
+</tr>
+

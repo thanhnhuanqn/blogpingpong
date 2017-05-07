@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Blog.Infrastructure;
+using NHibernate;
 using NHibernate.Bytecode.CodeDom;
 using NHibernate.Linq;
 using NHibernate.Mapping;
@@ -104,7 +105,11 @@ namespace Blog.Models
             Property(x=>x.Title, x=>x.NotNullable(true));
             Property(x=>x.Slug, x=>x.NotNullable(true));
             Property(x=>x.Excerpt, x=>x.NotNullable(false));
-            Property(x=>x.Content, x=>x.NotNullable(true));
+            Property(x=>x.Content, x =>
+            {
+                x.NotNullable(true);
+                x.Type(NHibernateUtil.StringClob);                
+            });
             Property(x => x.Status, x => x.NotNullable(false));
             Property(x => x.Password, x => x.NotNullable(false));
             Property(x => x.Parent, x => x.NotNullable(false));

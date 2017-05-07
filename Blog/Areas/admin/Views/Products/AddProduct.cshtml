@@ -1,0 +1,700 @@
+﻿@using Blog.Models
+@model Blog.Areas.admin.ViewModels.Product
+
+@{
+    ViewBag.Title = "AddProduct";
+}
+<style>
+    #sanphammoi input,
+    #sanphammoi select {
+        border-radius: 0;
+    }
+    label {                
+        font-weight: lighter!important;
+    }
+    .product_images {        
+        width: 100%;
+        height: 190px;        
+        white-space: nowrap;
+        overflow: hidden;
+        overflow-y: hidden;
+        overflow-x: scroll;
+    }
+    .product_images a{
+        float: left; 
+        width: 150px;
+        height: 150px;
+        margin: 10px;
+    }
+</style>
+<div class="wrap" id="sanphammoi">
+    <div class="row">        
+        @using (Html.BeginForm(null, null, FormMethod.Post))
+        {
+            @AntiForgery.GetHtml()
+            @Html.ValidationSummary()
+            <!-- Tab panes -->
+            <div class="col-lg-9">
+                <h1>Thêm mới sản phẩm</h1>
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#coban" aria-controls="coban" role="tab" data-toggle="tab">Thông tin cơ bản</a></li>
+                    <li role="presentation"><a href="#Info" aria-controls="Info" role="tab" data-toggle="tab">Mô tả sản phẩm</a></li>                    
+                    <li role="presentation"><a href="#SEO" aria-controls="settings" role="tab" data-toggle="tab">SEO</a></li>
+                    <li role="presentation"><a href="#Options" aria-controls="settings" role="tab" data-toggle="tab">Tuỳ chọn</a></li>
+                </ul>
+                <div class="tab-content">
+                    <br/>
+                    <div role="tabpanel" class="tab-pane active" id="coban">
+                        <div class="form-group">
+                            @Html.LabelFor(f => f.Title)
+                            @Html.TextBoxFor(f => f.Title, new {@class = "form-control"})
+                        </div>
+                        <div class="form-group">
+                            <div class="well">                                
+                                    <h5>Product Gallery</h5>
+                                    <div id="product_images_container">
+                                        <div class="row">
+                                            <div class="product_images">                                              
+                                            </div>
+                                        </div>
+                                        <input id="product_image_gallery" name="product_image_gallery" type="hidden">
+                                    </div>                                    
+                                    @Html.Partial("_Image", Model.ProductGallery)
+                                <p>
+                                        <a href="#"
+                                           data-choose="Add Images to Product Gallery"
+                                           data-update="Add to gallery"
+                                           data-delete="Delete image"
+                                           data-text="Delete"
+                                           data-toggle="modal"
+                                           data-target="#modal-2">
+                                            Thêm nhiều hình ảnh
+                                        </a>
+                                    </p>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">                            
+                            <div class="panel-body">
+                                <div class="row">                                   
+                                    <div class="col-md-6">
+                                        <div class="row">
+                                            <h5 style="padding-left: 15px;">Giá bán và thuế</h5>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(f => f.RegularPrice)
+                                                    @Html.TextBoxFor(f => f.RegularPrice, new {@class = "form-control", type = "number"})
+                                                    <span style="display: block; color: darkgrey; font-size: 12px;" id="convertRegularPrice"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    @Html.LabelFor(f => f.SalePrice)
+                                                    @Html.TextBoxFor(f => f.SalePrice, new {@class = "form-control", type = "number"})
+                                                    <span style="display: block; color: darkgrey; font-size: 12px;" id="convertSalePrice"></span>                                                    
+                                                    <a href="#" id="scheduleSale">Lập lịch</a>
+                                                </div>
+                                                <div class="form-group" id="scheduleSaleDiv" style="display: none">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="SalePriceDatesFrom">Từ ngày</label>
+                                                                <input type="date" id="SalePriceDatesFrom" class="form-control">
+                                                                <a href="#" id="cancelSchedule" class="description cancel_sale_schedule" style="display: block;">Huỷ bỏ</a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="SalePriceDatesTo">Đến ngày</label>
+                                                                <input type="date" id="SalePriceDatesTo" class="form-control">                                                                
+                                                            </div>                                                            
+                                                        </div>
+                                                    </div>                                                    
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="TaxRulesGroup">Mức thuế suất</label>
+                                                    <select id="TaxRulesGroup" class="form-control">
+                                                        <option value="0">Không có thuế</option>
+                                                        <option value="5">Thuế 5%</option>
+                                                        <option value="10">Thuế 10%</option>
+                                                    </select>
+                                                    <span style="display: block; color: darkgrey; font-size: 12px;" id="convertTaxRulesGroup"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="row">
+                                            <h5 style="padding-left: 15px;">Quản lý kho hàng</h5>
+                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                                @Html.LabelFor(f => f.Sku)
+                                                                @Html.TextBoxFor(f => f.Sku, new { @class = "form-control"})                                                            
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">                                                            
+                                                            <label for="StockStatus">Tình trạng sẵn có</label>                                                                                                                                
+                                                            <select id="StockStatus" name="StockStatus" class="form-control">
+                                                                <option value="instock">Có trong kho</option>
+                                                                <option value="outofstock">Hết hàng</option>
+                                                            </select>                                                                                                                            
+                                                        </div>
+                                                    </div>          
+                                                    <div class="clearfix"></div>                                      
+                                                    <div class="col-md-12">                                                        
+                                                        <label for="ManageStock">Quản lý số lượng ?&nbsp;</label><br/>
+                                                        <input type="checkbox" class="checkbox" style="" name="ManageStock" id="ManageStock" value="yes">
+                                                        <span class="description">Bật tính năng quản lý số lượng hàng còn trong kho</span>                                                        
+                                                    </div>
+                                                    <div class="clearfix"></div>
+                                                    <div class="col-lg-12" id="stockManager" style="display: none">
+                                                        <br/>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="StockQuantity">Số lượng trong kho</label>
+                                                                    <input type="number" id="StockQuantity" class="form-control" aria-valuemin="0" value="0">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="Backorders">Khi hết hàng ?</label>
+                                                                    <select id="Backorders" name="Backorders" class="form-control">
+                                                                        <option value="no">Không cho phép đặt hàng</option>
+                                                                        <option value="notify">Cho phép đặt hàng, ghi cảnh báo hết hàng</option>
+                                                                        <option value="yes">Cho phép đặt hàng</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>     
+                                            <div class="clearfix"></div>                                       
+                                            <div class="col-md-12">
+                                                <hr/>
+                                                <div class="form-group">
+                                                    <label for="SoldIndividually">Mua giới hạn: </label><br/>
+                                                    <input type="checkbox" id="SoldIndividually" class="form-control">
+                                                    Nếu chọn sẽ giới hạn chỉ mua được một sản phẩm này trong 1 đơn hàng.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <h5 style="padding-left: 15px;">Cách thức đóng gói</h5>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="TrongLuong">Trọng lượng (kg)</label>
+                                            <input type="number" id="TrongLuong" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="ChieuDai">Chiều dài</label>
+                                            <input type="number" id="ChieuDai" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="ChieuCao">Chiều cao</label>
+                                            <input type="number" id="ChieuCao" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="ChieuRong">Chiều rộng</label>
+                                            <input type="number" id="ChieuRong" class="form-control">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">                                    
+                                    <div class="col-md-6">
+                                        <h5>Sản phẩm liên kết</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="UpsellIds">Up-sells</label>
+                                                    <input name="UpsellIds" type="text" id="upsell_ids" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="CrosssellIds">Cross-sells</label>
+                                                    <input name="CrosssellIds" type="text" id="crosssell_ids" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Thuộc tính</h5>
+                                        <div class="row">                                            
+                                            <div class="col-md-12">
+                                                <label for="attribute_taxonomy">Thêm mới hoặc chọn thuộc tính có sẵn</label>
+                                                <div class="input-group">
+                                                    <select name="attribute_taxonomy" class="form-control">
+                                                        <option value="">Custom product attribute</option>
+                                                        <option value="pa_kich-thuoc">Kích thước</option>
+                                                        <option value="pa_mau-sac">Màu sắc</option>
+                                                    </select>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-info" type="button">Thêm</button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--End div class="col-lg-9">-->
+                    <div role="tabpanel" class="tab-pane " id="Info">                        
+                        <div class="form-group">
+                            @Html.LabelFor(f => f.ShortDescription)
+                            @Html.TextAreaFor(f => f.ShortDescription, new {@class = "form-control"})
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(f => f.Description)
+                            @Html.TextAreaFor(f => f.Description, new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane " id="SEO">                        
+                        <div class="form-group">
+                            @Html.LabelFor(f => f.Slug)
+                            @Html.TextBoxFor(f => f.Slug, new {@class = "form-control", data_Slug = "#Title"})
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(f => f.Keyword)
+                            @Html.TextAreaFor(f => f.Keyword, new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane " id="Options">                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label for="condition">Tinh trạng sản phẩm</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <select id="condition" class="form-control">
+                                                <option value="new">Mới 100%</option>
+                                                <option value="used">Đã sử dụng</option>
+                                                <option value="refurbished">Đã được tân trang</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-1">
+                                            <input type="checkbox" id="show_condition" name="show_condition" value="1">
+                                        </div>
+                                        <div class="col-md-11">
+                                            <label for="condition">Hiển thị tình trạng trong trang sản phẩm</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3" id="poststuff">
+                <div class="postbox">
+                    <h2 class="hndle">Publish</h2>
+                    <div id="sticky-span">
+                        <input id="sticky" name="sticky" type="checkbox" value="sticky">
+                        <label for="sticky" class="selectit">Sản phẩm nổi bật</label>
+                        <br /><br />
+                    </div>
+
+                    <div id="statusPost" class="form-group">
+                        <label for="post_status">Visibility</label>
+                        @SelectStatus()
+                    </div>
+                    <div id="visibilityPost" class="form-group">
+                        <label>Publish</label>
+                        <div>
+                            @DisplayMonth(Model.Month)
+                            <input type="text" value="@Model.Day" name="Day" style="width: 20px;" />,
+                            <input type="text" value="@Model.Year" name="Year" style="width: 35px;" /> @@
+                            <input type="text" value="@Model.Hour" name="Hour" style="width: 20px;" /> :
+                            <input type="text" value="@Model.Minutes" name="Minutes" style="width: 20px;" />
+                        </div>
+                    </div>
+
+                    <div class="form-group ">
+                        <label></label>
+                        <div>
+                            <input class="btn btn-primary" type="submit" value="Create" />
+                            <a href="javascript: history.back(1)">or Cancel</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="postbox">
+                    <div class="form-group">
+                        <h2 class="hndle">Product categories</h2>
+                        @DisplayMenuPost(Model.Categories)
+                    </div>
+                </div>
+                <div class="postbox">
+                    <div class="form-group">
+                        <h2 class="hndle">Product tags</h2>
+                        <input type="text" name="ctags" class="form-control" autocomplete="off" value="">
+                        <p class="description">Separate tags with commas</p>
+                    </div>
+                </div>
+
+                <div class="postbox">
+                    <div class="form-group">
+                        <h2 class="hndle">Featured Image</h2>
+                        @Html.Partial("_Media", Model.ProductGallery)
+                        <div id="imageDaChon" class="thumbnail">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+<div class="clearfix"></div>
+
+@section scripts{
+    @Scripts.Render("~/bundles/ckeditor")
+    <script>
+        $(function() {
+            CKEDITOR.replace('Description',
+                {
+                    filebrowserWindowWidth: 800,
+                    filebrowserWindowHeight: 600
+                });
+        });
+        $(function() {
+            $('.chooseimage').click(function(e) {
+                e.preventDefault();
+                $('div').removeClass('choose-image-border');
+
+                $('img').removeClass('chon-hinh-nay');
+
+                var id = "#image-" + $(this).attr("id");
+                $(id).addClass("choose-image-border");
+                $(this).addClass("chon-hinh-nay");
+            });
+
+            $('.chooseimage').dblclick(function(e) {
+                e.preventDefault();
+                var t = $('.chon-hinh-nay').attr("alt");
+                var file = '<img alt = "' + t + '" src="/uploads/thumb/' + t + '"/>';
+
+                file += '<input type = "hidden" name="image-choose" value = "' + $('.chon-hinh-nay').attr("id") + '"/>';
+
+                $('#imageDaChon').html(file);
+            });
+
+
+            $('#get_image_file_path').click(function(e) {
+                e.preventDefault();
+                var t = $('.chon-hinh-nay').attr("alt");
+                var file = '<img alt = "' + t + '" src="/uploads/thumb/' + t + '"/>';
+
+                file += '<input type = "hidden" name="image-choose" value = "' + $('.chon-hinh-nay').attr("id") + '"/>';
+
+                $('#imageDaChon').html(file);
+            });
+
+        });
+        $(document).ready(function() {
+
+            $("#ManageStock").click(function (e) {                
+                if ($('#ManageStock').is(':checked')) {
+                    $('#stockManager').fadeIn();
+                } else {
+                    $('#stockManager').fadeOut();
+                }
+            });
+
+
+            $("#scheduleSale").click(function (e) {
+                e.preventDefault();
+                $('#scheduleSaleDiv').fadeIn();
+                $(this).hide();
+            });
+
+            $("#cancelSchedule").click(function (e) {
+                e.preventDefault();
+                $('#scheduleSaleDiv').fadeOut();
+                $("#scheduleSale").show();
+            });
+
+            $('#RegularPrice').keyup(function(e) {
+                $('#convertRegularPrice').html(Number($(this).val())
+                    .toLocaleString('en-US', { minimumFractionDigits: 0 })
+                );
+                tinhThue();
+            });
+
+
+            $('#SalePrice').keyup(function(e) {
+                $('#convertSalePrice').html(Number($(this).val())
+                    .toLocaleString('en-US', { minimumFractionDigits: 0 })
+                );
+                tinhThue();
+            });
+            $('#TaxRulesGroup').change(function() {
+                tinhThue();
+            });
+
+            function tinhThue() {
+                var thue = parseInt($('#TaxRulesGroup').val() || 0);
+                var price = parseInt($('#RegularPrice').val() || 0);
+                var sale = parseInt($('#SalePrice').val() || 0);
+                var tien = sale === 0 ? price + (price * (thue / 100)) : sale + (sale * (thue / 100));
+//                $('#SalePrice').val(tien);
+                $('#convertTaxRulesGroup').html(Number(tien).toLocaleString('en-US', { minimumFractionDigits: 0 }));
+            }       
+
+
+
+            var $productImages = $('#product_images_container').find('.product_images');
+            var $imageGalleryIds = $('#product_image_gallery');
+
+            $('.attachment-image').click(function (e) {
+                //debugger;
+                e.preventDefault();
+
+                //$('div').removeClass('choose-image-border');
+                $(this).parent().parent().parent().parent().addClass("choose-image-border");
+
+                var attachmentIds = $imageGalleryIds.val();
+
+                var idProduct = $(this).attr("id");
+                var imageName = $(this).attr("alt");
+                var attachmentImage = '/uploads/thumb/' + imageName;
+                var arr = attachmentIds.split(",");
+                var flag = arr.indexOf(idProduct);
+                if (flag < 0) {
+                    attachmentIds = attachmentIds ? attachmentIds + ',' + idProduct : idProduct;
+                    $productImages.append(                        
+                            '<a class="thumbnail" data-attachment_id="' + idProduct + '">' +
+                                '<img src="' + attachmentImage + '" />' +
+                            '</a>'                        
+                        );
+                }
+                $imageGalleryIds.val(attachmentIds);
+            });
+
+            // Remove images
+            $('#product_images_container').on('click', 'a.delete', function () {
+                $(this).closest('li.image').remove();
+
+                var attachmentIds = '';
+
+                $('#product_images_container').find('ul li.image').css('cursor', 'default').each(function () {
+                    var attachment_id = jQuery(this).attr('data-attachment_id');
+                    attachmentIds = attachmentIds + attachment_id + ',';
+                });
+
+                $imageGalleryIds.val(attachmentIds);
+
+                // remove any lingering tooltips
+                $('#tiptip_holder').removeAttr('style');
+                $('#tiptip_arrow').removeAttr('style');
+
+                return false;
+            });
+    });
+    </script>
+
+}
+
+@helper SelectStatus(string status = null)
+{
+    string publish = string.Empty;
+    string draft = string.Empty;
+    string pedding = string.Empty;
+
+    if (status != null)
+    {
+        if (status.Equals("publish"))
+        {
+            publish = "selected";
+        }
+        else if (status.Equals("draft"))
+        {
+            draft = "selected";
+        }
+        else if (status.Equals("pedding"))
+        {
+            pedding = "selected";
+        }
+    }
+    <select name="Status" class="form-control">
+        <option @publish value="publish">Publish</option>
+        <option @draft value="draft">Draft</option>
+        <option @pedding value="pedding">Pedding Review</option>
+    </select>
+}
+
+@helper DisplayMonth(int monthEdit = 0, string classCss = "")
+{
+    var month = DateTime.Now.ToString("MM");
+    var selected = string.Empty;
+    var value = string.Empty;
+    <select name="month" id="month" class="@classCss">
+        @for (var i = 1; i <= 12; i++)
+        {
+            string name = string.Empty;
+            switch (i)
+            {
+                case 1:
+                    name = "Jan";
+                    break;
+                case 2:
+                    name = "Feb";
+                    break;
+                case 3:
+                    name = "Mar";
+                    break;
+                case 4:
+                    name = "Apr";
+                    break;
+                case 5:
+                    name = "May";
+                    break;
+                case 6:
+                    name = "Jun";
+                    break;
+                case 7:
+                    name = "Jul";
+                    break;
+                case 8:
+                    name = "Aug";
+                    break;
+                case 9:
+                    name = "Sep";
+                    break;
+                case 10:
+                    name = "Oct";
+                    break;
+                case 11:
+                    name = "Nov";
+                    break;
+                case 12:
+                    name = "Dec";
+                    break;
+
+            }
+            value = (i < 10) ? "0" + i : i.ToString();
+            //selected = (month == value && monthEdit == value.AsInt()) ? "selected" : (monthEdit == value.AsInt()) ? "selected" : string.Empty;
+            if (month == value && monthEdit == value.AsInt())
+            {
+                selected = "selected";
+            }
+            else if (monthEdit == value.AsInt())
+            {
+                selected = "selected";
+            }
+            else
+            {
+                selected = string.Empty;
+            }
+            <option @selected value="@value">@value-@name</option>
+        }
+    </select>
+}
+
+
+@helper DisplayMenuPost(IEnumerable<Term> categories, IEnumerable<Term> list = null)
+{
+
+    <ul class="categorychecklist">
+        @for (var i = 0; i < Model.Categories.Count; i++)
+        {
+            var cat = Model.Categories[i];
+
+            if (cat.Parent == 0)
+            {
+                <li>
+                    @if (list != null)
+                    {
+                        string isChecked = string.Empty;
+                        var inList = list.FirstOrDefault(p => p.Parent == cat.Parent);
+                        if (inList != null)
+                        {
+                            isChecked = "checked";
+                        }
+                        <input type="checkbox" name="categories" value="@cat.Id" @isChecked/>
+                        @cat.Name
+                    }
+                    else
+                    {
+                        <input type="checkbox" name="categories" value="@cat.Id"/>
+                        @cat.Name
+                    }
+
+                </li>
+                @DisplaySubMenuPost((int) cat.Id, categories, list, 1)
+
+            }
+
+        }
+    </ul>
+}
+
+@helper DisplaySubMenuPost(int id, IEnumerable<Term> categories, IEnumerable<Term> list, int level = 1)
+{
+    string rowPerfix = string.Empty;
+
+    for (var k = 0; k < Model.Categories.Count; k++)
+    {
+        var cat = Model.Categories[k];
+
+        if (id == cat.Parent)
+        {
+            for (int i = 0; i < level; i++)
+            {
+                rowPerfix += "— ";
+            }
+            <li data-level="@level">
+                @if (list != null)
+                {
+                    string isChecked = string.Empty;
+                    var inList = list.SingleOrDefault(p => p.Id == cat.Id);
+                    if (inList != null)
+                    {
+                        isChecked = "checked";
+                    }
+                    <input type="checkbox" name="categories" value="@cat.Id" @isChecked/>
+                    @rowPerfix@cat.Name
+                }
+                else
+                {
+                    <input type="checkbox" name="categories" value="@cat.Id"/>
+                    @rowPerfix@cat.Name
+                }
+
+            </li>
+            level++;
+            //đệ qui
+            @DisplaySubMenuPost((int) cat.Id, categories, list, level)
+            ;
+            level = level - 1;
+            rowPerfix = string.Empty;
+        }
+
+    }
+}

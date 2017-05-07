@@ -89,11 +89,11 @@ namespace Blog.Migrations
                 .Indexed()
 
                 .WithColumn("excerpt")
-                .AsCustom("TEXT")
+                .AsCustom("NTEXT")
                 .Nullable()
 
                 .WithColumn("content")
-                .AsCustom("TEXT")
+                .AsCustom("NTEXT")
 
                 .WithColumn("status")
                 .AsString(20)
@@ -131,7 +131,7 @@ namespace Blog.Migrations
                 .WithColumn("slug").AsString(200).Unique()
                 .WithColumn("group").AsInt32().WithDefaultValue(0)
                 .WithColumn("taxonomy").AsString(32)
-                .WithColumn("description").AsCustom("TEXT").Nullable()
+                .WithColumn("description").AsCustom("NTEXT").Nullable()
                 .WithColumn("parent").AsInt64().WithDefaultValue(0)
                 .WithColumn("count").AsInt64().WithDefaultValue(0)
 
@@ -146,7 +146,7 @@ namespace Blog.Migrations
             Create.Table("options")
                 .WithColumn("id").AsInt64().PrimaryKey().Identity()
                 .WithColumn("name").AsString(64)
-                .WithColumn("value").AsCustom("TEXT")
+                .WithColumn("value").AsCustom("NTEXT")
                 .WithColumn("autoload").AsString(20).WithDefaultValue("yes")
                 ;
 
@@ -159,7 +159,7 @@ namespace Blog.Migrations
                 .WithColumn("url").AsString(200).Nullable()
                 .WithColumn("ip").AsString(100).Nullable()
                 .WithColumn("created").AsDateTime()
-                .WithColumn("content").AsCustom("TEXT")
+                .WithColumn("content").AsCustom("NTEXT")
                 .WithColumn("karma").AsInt32().WithDefaultValue(0)
                 .WithColumn("approved").AsString(20).WithDefaultValue("1")
                 .WithColumn("agent").AsString(20).Nullable()

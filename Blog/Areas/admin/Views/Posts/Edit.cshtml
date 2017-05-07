@@ -11,12 +11,11 @@
     <div class="row">
         @using (Html.BeginForm())
         {
-            @AntiForgery.GetHtml()
-            @Html.ValidationSummary()
+            @AntiForgery.GetHtml()            
             @Html.Hidden("Id", Model.Id)
 
             <div class="col-md-9">
-                @Html.ValidationSummary(true)
+                @Html.ValidationSummary()
                 <div class="form-group">
                     @Html.LabelFor(f => f.Title)
                     @Html.TextBoxFor(f => f.Title, new { @class = "form-control" })
@@ -87,7 +86,6 @@
                     <div class="form-group">                        
                         <h2 class="hndle">Categories</h2>
                         @DisplayMenuPost(ViewBag.Category, Model.Category)
-                        @Html.ValidationMessage("Categories")
                     </div>
                 </div>
                 <div class="postbox">
@@ -109,7 +107,7 @@
                                     var image = Database.Session.Load<Post>(long.Parse(meta.MetaValue));
                                     if (image != null)
                                     {
-                                        <img alt="@image.Title" src="/uploads/medium/@image.Guid" />
+                                        <img alt="@image.Title" src="/Uploads/Thumb/@image.Guid" />
                                         <input type="hidden" name="image-choose" value="@image.Id" />
                                     }
                                 }
@@ -148,7 +146,7 @@
                 $('.chooseimage').dblclick(function (e) {
                     e.preventDefault();
                     var t = $('.chon-hinh-nay').attr("alt");
-                    var file = '<img alt = "' + t + '" src="/uploads/medium/' + t + '"/>';
+                    var file = '<img alt = "' + t + '" src="/uploads/thumb/' + t + '"/>';
 
                     file += '<input type = "hidden" name="image-choose" value = "' + $('.chon-hinh-nay').attr("id") + '"/>';
 
@@ -159,7 +157,7 @@
                 $('#get_image_file_path').click(function (e) {
                     e.preventDefault();
                     var t = $('.chon-hinh-nay').attr("alt");
-                    var file = '<img alt = "' + t + '" src="/uploads/medium/' + t + '"/>';
+                    var file = '<img alt = "' + t + '" src="/uploads/thumb/' + t + '"/>';
 
                     file += '<input type = "hidden" name="image-choose" value = "' + $('.chon-hinh-nay').attr("id") + '"/>';
 

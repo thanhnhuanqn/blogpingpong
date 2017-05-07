@@ -15,28 +15,28 @@ namespace Blog.Migrations
                 .WithColumn("id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("post_id").AsInt64().NotNullable()
                 .WithColumn("meta_key").AsString(255).Nullable()
-                .WithColumn("meta_value").AsCustom("TEXT").Nullable()
+                .WithColumn("meta_value").AsCustom("NTEXT").Nullable()
                 ;
 
             Create.Table("termmeta")
                 .WithColumn("id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("term_id").AsInt64().NotNullable()
                 .WithColumn("meta_key").AsString(255).Nullable()
-                .WithColumn("meta_value").AsCustom("TEXT").Nullable()
+                .WithColumn("meta_value").AsCustom("NTEXT").Nullable()
                 ;
 
             Create.Table("commentmeta")
                 .WithColumn("id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("comment_id").AsInt64().NotNullable()
                 .WithColumn("meta_key").AsString(255).Nullable()
-                .WithColumn("meta_value").AsCustom("TEXT").Nullable()
+                .WithColumn("meta_value").AsCustom("NTEXT").Nullable()
                 ;
 
             Create.Table("usermeta")
                 .WithColumn("id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("user_id").AsInt64().NotNullable()
                 .WithColumn("meta_key").AsString(255).Nullable()
-                .WithColumn("meta_value").AsCustom("TEXT").Nullable()
+                .WithColumn("meta_value").AsCustom("NTEXT").Nullable()
                 ;            
         }
 

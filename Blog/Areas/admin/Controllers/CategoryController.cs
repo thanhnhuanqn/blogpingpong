@@ -10,7 +10,7 @@ using NHibernate.Linq;
 
 namespace Blog.Areas.admin.Controllers
 {
-    [SelectedTab("Category")]
+    [SelectedTab("Posts")]
     public class CategoryController : Controller
     {
 

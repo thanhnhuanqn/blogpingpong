@@ -10,8 +10,8 @@
         @using (Html.BeginForm())
         {
             @AntiForgery.GetHtml()
-            @Html.ValidationSummary(true)
             <div class="col-md-9">
+                @Html.ValidationSummary()
                 <div class="form-group">
                     @Html.LabelFor(f => f.Title)
                     @Html.TextBoxFor(f => f.Title, new {@class = "form-control"})
@@ -30,8 +30,6 @@
                     @Html.LabelFor(f => f.Content)
                     @Html.TextAreaFor(f => f.Content, new {@class = "form-control"})
                 </div>
-
-
                 <div class="form-group">
                     @Html.LabelFor(f => f.Keyword)
                     @Html.TextBoxFor(f => f.Keyword, new {@class = "form-control"})
@@ -73,8 +71,7 @@
                 <div class="postbox">
                     <div class="form-group">
                         <h2 class="hndle">Categories</h2>
-                        @DisplayMenuPost(Model.Category)
-                        @Html.ValidationMessage("Categories")
+                        @DisplayMenuPost(Model.Category)                        
                     </div>
                 </div>
                 <div class="postbox">
@@ -121,7 +118,7 @@
             $('.chooseimage').dblclick(function (e) {
                 e.preventDefault();
                 var t = $('.chon-hinh-nay').attr("alt");
-                var file = '<img alt = "' + t + '" src="/uploads/medium/' + t + '"/>';
+                var file = '<img alt = "' + t + '" src="/uploads/thumb/' + t + '"/>';
 
                 file += '<input type = "hidden" name="image-choose" value = "' + $('.chon-hinh-nay').attr("id") + '"/>';
 
@@ -132,7 +129,7 @@
             $('#get_image_file_path').click(function (e) {
                 e.preventDefault();
                 var t = $('.chon-hinh-nay').attr("alt");
-                var file = '<img alt = "' + t + '" src="/uploads/medium/' + t + '"/>';
+                var file = '<img alt = "' + t + '" src="/uploads/thumb/' + t + '"/>';
 
                 file += '<input type = "hidden" name="image-choose" value = "' + $('.chon-hinh-nay').attr("id") + '"/>';
 

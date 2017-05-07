@@ -5,6 +5,7 @@
 @{
     ViewBag.Title = "Edit " + Model.Name;
 }
+<div class="wrap">
 <h1>Edit Category</h1>
 @using (Html.BeginForm())
 {
@@ -34,6 +35,7 @@
     <input type="submit" value="Edit Category" class="btn btn-primary" />
     <a href="@Url.Action("Index")">or Cancel</a>
 }
+</div>
 @helper DisplayMenuSelect(CategoryNew category)
 {    
     <select class="form-control" name="Parent">
