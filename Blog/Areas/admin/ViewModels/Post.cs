@@ -7,7 +7,7 @@ using System.Web.Mvc;
 using Blog.Infrastructure;
 using Blog.Models;
 using NHibernate.Linq;
-using Paging;
+using Blog.Module.Paging;
 
 namespace Blog.Areas.admin.ViewModels
 {

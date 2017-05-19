@@ -10,18 +10,18 @@ using Blog.Infrastructure;
 using Blog.Models;
 using CKFinder.Connector;
 using NHibernate.Linq;
-using Paging;
+using Blog.Module.Paging;
 
 namespace Blog.Areas.admin.Controllers
 {
+    [Authorize(Roles = "admin")]
     [SelectedTab("Media")]
     public class MediaController : Controller
     {
         private string PostType = "Image";        
-        private const int PostsPerPage = 15;
-
+        private const int DefaultPageSize = 15;
         // GET: admin/Media
-        public ActionResult Index(int page = 1)
+        public ActionResult Index(int? page = 1)
         {          
             var files = Request.Files;
             if (files != null)
@@ -37,23 +37,10 @@ namespace Blog.Areas.admin.Controllers
             }
 
             var baseQuery = Database.Session.Query<Post>().Where(t=>t.Type== PostType).OrderByDescending(c => c.CreateAt);
+         
+            int currentPageIndex = page.HasValue ? page.Value - 1 : 0;
 
-            var totalPostCount = baseQuery.Count();
-
-            var postIds = baseQuery
-                .Skip((page - 1) * PostsPerPage)
-                .Take(PostsPerPage)
-                .Select(p => p.Id)
-                .ToArray();
-
-            var currentPostPage = baseQuery
-                .Where(p => postIds.Contains(p.Id))                
-                .ToList();
-
-            return View(new PostsIndex
-            {
-                Posts = new PageData<Post>(currentPostPage, totalPostCount, page, PostsPerPage)
-            });
+            return View(baseQuery.ToPagedList(currentPageIndex, DefaultPageSize));
 
         }
 
@@ -263,6 +250,85 @@ namespace Blog.Areas.admin.Controllers
                 img.Resize(Width, Height);
                 img.Save(pathFinal, img.ImageFormat);
             }
+        }
+
+        [HttpPost]
+        public ActionResult Resize(FormCollection data)
+        {
+            var largeSizeW = int.Parse(Request["large_size_w"]);
+            var largeSizeH = int.Parse(Request["large_size_h"]);
+
+            foreach (var file in GetAllPagesInFolder("~/uploads", "*.*"))
+            {                
+                //Thumbs]
+                var fileName = file.Split('/').Reverse().ToList();
+
+                CreateImage(width: largeSizeW, height: largeSizeH, file_name: fileName[0], folderSaveFile: @"~\uploads\tmp\");                
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        /// <summary>
+        /// Đọc tất cả các file trong một thư mục được chỉ định.
+        /// </summary>
+        /// <param name="virtualPath">đường dẫn tới thư mục</param>
+        /// <param name="searchPattern">tên file tìm kiếm</param>
+        /// <returns>tất cả các file trong thư mục đó.</returns>
+
+        public static string[] GetAllPagesInFolder(string virtualPath, string searchPattern)
+        {
+            string physicalPath = System.Web.HttpContext.Current.Server.MapPath(virtualPath);
+
+            // childrenFiles are physical paths. We need to convert them into virtual paths
+            string[] childrenFiles = Directory.EnumerateFiles(physicalPath, searchPattern, SearchOption.TopDirectoryOnly).ToArray();
+            string[] childrenVirtualPaths = new string[childrenFiles.Length];
+
+            for (int i = 0; i < childrenFiles.Length; ++i)
+            {
+                // convert physical path to virtual path
+                childrenVirtualPaths[i] = childrenFiles[i].Replace(System.Web.HttpContext.Current.Request.PhysicalApplicationPath, "~/").Replace(Path.DirectorySeparatorChar, '/');
+            }
+
+            return childrenVirtualPaths;
+        }
+
+
+        /// <summary>
+        /// Xoa cac bai viet co id chua trong listItem
+        /// </summary>
+        public ActionResult DeleteImages()
+        {
+            var listIdPost = Request["DeleteImages"];
+
+            if (string.IsNullOrEmpty(listIdPost)) return RedirectToAction("Index");
+
+            var arraySlug = listIdPost.Split(',').Where(p => p != string.Empty).Distinct().ToArray();
+
+            if (!arraySlug.Any()) return RedirectToAction("Index");
+
+            foreach (var idPost in arraySlug)
+            {
+                long id;
+
+                var flag = long.TryParse(idPost, out id);
+
+                if (!flag) continue;
+
+                var post = Database.Session.Load<Post>(id);
+                if (post == null) continue;
+
+                DeleteFile(post.Guid, "~/Uploads/");
+                DeleteFile(post.Guid, "~/Uploads/thumb/");
+                DeleteFile(post.Guid, "~/Uploads/medium/");
+                DeleteFile(post.Guid, "~/Uploads/large/");
+                DeleteFile(post.Guid, "~/Uploads/tmp/");
+
+                Database.Session.Delete(post);
+                Database.Session.Flush();
+            }
+
+            return RedirectToAction("Index");
         }
     }
 }

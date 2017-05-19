@@ -1,0 +1,11 @@
+﻿@model Blog.ViewModels.PostsIndex
+@{
+    ViewBag.Title = "Ping Pong Code";
+    Layout = "~/Views/VouxTheme/_LayoutSite.cshtml";
+}
+
+<div class="section" id="main">
+    <div class="widget Blog" data-version="1" id="Blog1">
+        @Html.Partial("_Posts", Model.Posts)        
+    </div>
+</div>

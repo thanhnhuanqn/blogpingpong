@@ -10,6 +10,7 @@ using NHibernate.Linq;
 
 namespace Blog.Areas.admin.Controllers
 {
+    [Authorize(Roles = "admin")]
     [SelectedTab("Posts")]
     public class CategoryController : Controller
     {
@@ -113,14 +114,24 @@ namespace Blog.Areas.admin.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Delete(int id)
+        public ActionResult Delete(long id)
         {
-            var category = Database.Session.Load<Term>((Int64)id);
+            var category = Database.Session.Load<Term>(id);
 
             if (category == null) return HttpNotFound();
-
+            
             Database.Session.Delete(category);
             Database.Session.Flush();
+
+            var searchParent = Database.Session.Query<Term>().Where(t => t.Parent == id);
+
+            foreach (var term in searchParent)
+            {
+                term.Parent = 0;
+                Database.Session.Update(term);
+                Database.Session.Flush();
+            }
+            
             return RedirectToAction("Index");
 
         }

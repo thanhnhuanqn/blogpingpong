@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Paging
+namespace Blog.Module.Paging
 {
     public interface IPagedList
     {

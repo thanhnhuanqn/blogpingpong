@@ -4,7 +4,7 @@ using System.Web.Mvc;
 using System.Web.Mvc.Ajax;
 using System.Web.Routing;
 
-namespace Paging
+namespace Blog.Module.Paging
 {
     /// <summary>
     /// Pager options builder class. Enables a fluent interface for adding options to the pager.

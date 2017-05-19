@@ -1,50 +1,77 @@
-﻿@model Blog.Infrastructure.PageData<Blog.Models.Post>
-
+﻿@model Blog.Module.Paging.IPagedList<Blog.Models.Post>
+@using Blog.Models
+@using Blog.Module.Paging
 @{
     ViewBag.Title = "Manager posts";
 }
-<div class="wrap">    
-    <div class="btn-toolbar">       
-        <br />
-        <div>
-            <table class="table table-hover widefat table-responsive fixed">
-                <thead>
-                <tr>
-                    <th style="width: 3%" ><input id="cb-select-all-1" type="checkbox"></th>
-                    <th style="width: 60px"></th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th  style="width: 100px">Date</th>
-                    <th style="width: 30px"></th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach (var item in Model)
-                {
-                       
-                    @Html.Partial("_Image", item)
-                }
-                </tbody>
-            </table>           
+<link href="~/Areas/admin/Scripts/tablesaw/tablesaw.css" rel="stylesheet" />
+<script src="~/Areas/admin/Scripts/tablesaw/tablesaw.jquery.js"></script>
+<script src="~/Areas/admin/Scripts/tablesaw/tablesaw-init.js"></script>
+
+<div class="wrap">
+@using (Html.BeginForm("DeleteImages", "Media", FormMethod.Post))
+{
+    <div class="btn-toolbar">
+        <div class="nav nav-pills">
+            <div class="row">
+                <div class="col-md-8 col-xs-6">
+                    <div class="dropdown" role="presentation">
+                        <button class="btn btn-default btn-sm" type="button" id="dd-menu" data-toggle="dropdown">
+                            Action <span class="caret"></span>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <div role="presentation">
+                                <a href="@Url.Action("New")" class="btn btn-link">
+                                    <span class="glyphicon glyphicon-new-window"></span> Add new
+                                </a>
+                            </div>
+                            <div role="presentation">
+                                <button class="btn btn-link" type="submit" value="btnDelAll" id="deleteActionRun" name="deleteActionRun" role="menuitem" tabindex="-1">
+                                    <span class="glyphicon glyphicon-remove"></span> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-6">
+                    <div class="nav-text text-right">
+                        <p>Have all @Model.TotalItemCount @(Model.TotalItemCount > 1 ? "items" : "item")</p>
+                    </div>
+                </div>
+            </div>
         </div>
+        <br/>
     </div>
-    <div class="clearfix"></div>
-    <ul class="list-unstyled">
-        @if (Model.HasPreviousPage)
+
+    <table data-tablesaw-sortable class="tablesaw table table-hover widefat fixed">
+        <thead>
+        <tr>
+            <th style="width: 3%" scope="col"><input data-tablesaw-checkall type="checkbox"></th>
+            <th style="width: 60px"></th>
+            <th scope="col" data-tablesaw-sortable-col data-tablesaw-sortable-default-col data-tablesaw-priority="persist" class="column-title">Title</th>
+            <th>Author</th>
+            <th style="width: 100px" scope="col" data-tablesaw-priority="2" data-tablesaw-sortable-col class="column-date">Date</th>
+            <th style="width: 30px"></th>
+
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
         {
-            <li class="pull-left">
-                <a href="@Url.Action(null, new {page = Model.PreviousPage})" class="btn btn-primary">
-                    <i class="glyphicon glyphicon-chevron-left"></i> Newer Posts
-                </a>
-            </li>
+
+            @Html.Partial("_Image", item)
         }
-        @if (Model.HasNextPage)
-        {
-            <li class="pull-left">
-                <a href="@Url.Action(null, new {page = Model.NextPage})" class="btn btn-primary">
-                    Older Posts <i class="glyphicon glyphicon-chevron-right"></i>
-                </a>
-            </li>
-        }
-    </ul>
+        </tbody>
+    </table>
+
+
+    <div class="pager">
+        @Html.Pager(Model.PageSize, Model.PageNumber, Model.TotalItemCount).Options(o => o
+            .DisplayTemplate("Bootstrap3Pagination")
+            .MaxNrOfPages(14)
+            .AlwaysAddFirstPageNumber()
+            .HidePreviousAndNextPage()
+            )
+    </div>
+}
 </div>

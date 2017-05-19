@@ -1,7 +1,7 @@
 ﻿@model Blog.Models.Post
 
 <tr>
-    <td><input id="checkbox-@Model.Id" type="checkbox" /></td>
+    <td><input name="DeleteImages" value="@Model.Id" id="checkbox-@Model.Id" type="checkbox" /></td>
     <td>
         <a href="#@Model.Id" title="Edit @Model.Title">
             <img src="~/uploads/thumb/@Model.Guid" alt="@Model.Title" height="60" />

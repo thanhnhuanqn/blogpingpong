@@ -14,6 +14,7 @@ using NHibernate.Linq;
 
 namespace Blog.Areas.admin.Controllers
 {
+    [Authorize(Roles = "admin")]
     [SelectedTab("Appearance")]
     public class AppearanceController : Controller
     {

@@ -5,7 +5,7 @@ using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
 
-namespace Paging
+namespace Blog.Module.Paging
 {
     public class Pager : IHtmlString
     {

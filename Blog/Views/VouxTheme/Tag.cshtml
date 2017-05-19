@@ -1,0 +1,21 @@
+﻿@model Blog.ViewModels.PostsTag
+@{
+    ViewBag.Title = Model.Tag.Name;
+    Layout = "~/Views/VouxTheme/_LayoutSite.cshtml";
+}
+<div class="section" id="main">
+    <h2 style="padding-top: 10px; padding-bottom: 10px;">
+        <span id="blog-pager-newer-link">
+            Các bài viết có tag: <strong>@Model.Tag.Name</strong>
+        </span>
+        <span id="blog-pager-older-link">
+            <a href="@Url.RouteUrl("Home")" class="pull-right">xem tất cả</a>
+        </span>
+    </h2>
+    <hr />
+    <div class="clearfix"></div>
+    <div class="widget Blog" data-version="1" id="Blog1">
+        @Html.Partial("_Posts", Model.Posts)
+    </div>
+</div>
+

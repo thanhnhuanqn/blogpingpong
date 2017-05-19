@@ -10,11 +10,25 @@ using NHibernate.Linq;
 
 namespace Blog.Areas.admin.Controllers
 {
+    [Authorize(Roles = "admin")]
     [SelectedTab("Posts")]
     public class TagsController : Controller
     {
         private string Type = "tag";
-        
+
+
+        public bool CheckSlugUnique(long id, string slug)
+        {
+            var post = Database.Session.Query<Term>().Where(p => p.Slug == slug);
+
+            if (id <= 0) return post.Any();
+
+            post = Database.Session.Query<Term>().Where(p => p.Id != id && p.Slug == slug);
+
+            return post.Any();
+
+        }
+
         // GET: admin/Category
         public ActionResult Index()
         {
@@ -50,7 +64,9 @@ namespace Blog.Areas.admin.Controllers
             category.Name = form.Name.Trim();
             category.Slug = !string.IsNullOrEmpty(form.Slug) ? form.Slug.UrlFriendly() : form.Name.UrlFriendly();
             category.Taxonomy = "tag";
-            category.Description = form.Description;            
+            category.Description = form.Description;
+
+            category.Slug = UniqueSlug.CreateSlug(CheckSlugUnique, category.Slug, category.Id);
 
             Database.Session.Save(category);
             Database.Session.Flush();
@@ -91,6 +107,8 @@ namespace Blog.Areas.admin.Controllers
             category.Slug = !string.IsNullOrEmpty(form.Slug) ? form.Slug.UrlFriendly() : form.Name.UrlFriendly();
             category.Description = form.Description;
             category.Parent = form.Parent;
+
+            category.Slug = UniqueSlug.CreateSlug(CheckSlugUnique, category.Slug, category.Id);
 
             Database.Session.Update(category);
             Database.Session.Flush();

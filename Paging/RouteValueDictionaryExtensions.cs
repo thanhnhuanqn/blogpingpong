@@ -1,6 +1,6 @@
 ﻿using System.Web.Routing;
 
-namespace Paging
+namespace Blog.Module.Paging
 {
     public static class RouteValueDictionaryExtensions
     {

@@ -11,6 +11,7 @@ using NHibernate.Linq;
 
 namespace Blog.Areas.admin.Controllers
 {
+    [Authorize(Roles = "admin")]
     [SelectedTab("users")]
     public class UsersController : Controller
     {
@@ -154,6 +155,7 @@ namespace Blog.Areas.admin.Controllers
             user.SetPassword(form.Password);
 
             Database.Session.Update(user);
+            Database.Session.Flush();
 
             return RedirectToAction("Index");
         }

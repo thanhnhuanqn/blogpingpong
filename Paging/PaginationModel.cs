@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Web.Mvc.Ajax;
 
-namespace Paging
+namespace Blog.Module.Paging
 {
     public class PaginationModel
     {

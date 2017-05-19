@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using Blog.Areas.admin.ViewModels;
 using Blog.Infrastructure;
 using Blog.Models;
-using NHibernate;
 using NHibernate.Linq;
-using Paging;
+using Blog.Module.Paging;
 
 namespace Blog.Areas.admin.Controllers
 {
+    [Authorize(Roles = "admin")]
     [SelectedTab("Posts")]
     public class PostsController : Controller
     {
@@ -32,11 +31,49 @@ namespace Blog.Areas.admin.Controllers
         }
 
         // GET: admin/Posts
-        public ActionResult Index(int? page)
+        public ActionResult Index(int? page, string status, string category, string tag, string user, string search)
         {
             var currentPageIndex = page - 1 ?? 0;
 
-            return View(Database.Session.Query<Post>().Where(p => p.Type == PostType).OrderByDescending(t => t.CreateAt).ToPagedList(currentPageIndex, DefaultPageSize));
+            var posts = Database.Session.Query<Post>().Where(t => t.Type == "post");
+
+            if (!string.IsNullOrEmpty(status))
+                posts = Database.Session.Query<Post>().Where(t => t.Type == "post" && t.Status == status.Trim());
+
+            if (category != null)
+            {
+                var cat = Database.Session.Load<Term>(long.Parse(category));
+                if (cat != null)
+                {
+                    posts = Database.Session.Query<Post>().Where(t => t.Type == "post" && t.Category.Contains(cat));
+                }
+            }
+
+            if (tag != null)
+            {
+                var cat = Database.Session.Load<Term>(long.Parse(tag));
+                if (cat != null)
+                {
+                    posts = Database.Session.Query<Post>().Where(t => t.Type == "post" && t.Category.Contains(cat));
+                }
+            }
+
+            if (!string.IsNullOrEmpty(user))
+            {
+                var userPost = Database.Session.Load<User>(int.Parse(user));
+                if (userPost != null)
+                {
+                    posts = Database.Session.Query<Post>().Where(t => t.Type == "post" && t.User.Id == userPost.Id);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                posts = Database.Session.Query<Post>().Where(t => t.Type == "post" && t.Title.Contains(search));
+            }
+
+
+            return View(posts.OrderByDescending(t => t.CreateAt).ToPagedList(currentPageIndex, DefaultPageSize));
         }
 
         public ActionResult New()
@@ -47,13 +84,13 @@ namespace Blog.Areas.admin.Controllers
                 Month = DateTime.Now.Month,
                 Year = DateTime.Now.Year,
                 Hour = DateTime.Now.Hour,
-                Minutes = DateTime.Now.Minute                
+                Minutes = DateTime.Now.Minute
             });
         }
 
         public static void AddCategoriesTagsPost(Post post, string listTag, string categories)
         {
-            
+
             if (post == null) return;
 
             var tags = new List<Term>();
@@ -86,7 +123,7 @@ namespace Blog.Areas.admin.Controllers
                         newTag.Slug = UniqueSlug.CreateSlug(CheckSlugUnique, newTag.Slug, newTag.Id);
 
                         Database.Session.Save(newTag);
-                        var oldTag = Database.Session.Query<Term>().OrderByDescending(ta=>ta.Id).FirstOrDefault();
+                        var oldTag = Database.Session.Query<Term>().OrderByDescending(ta => ta.Id).FirstOrDefault();
                         if (oldTag != null)
                         {
                             tags.Add(oldTag);
@@ -111,7 +148,7 @@ namespace Blog.Areas.admin.Controllers
             post.Category = tags;
 
             if (post.Category == null) return;
-            
+
             Database.Session.Update(post);
             Database.Session.Flush();
         }
@@ -124,22 +161,22 @@ namespace Blog.Areas.admin.Controllers
                 ModelState.AddModelError("categories", "Category is not set");
             }
             if (!ModelState.IsValid)
-            {                
+            {
                 return View(new PostsForm
                 {
                     Day = DateTime.Now.Day,
                     Month = DateTime.Now.Month,
                     Year = DateTime.Now.Year,
                     Hour = DateTime.Now.Hour,
-                    Minutes = DateTime.Now.Minute                    
+                    Minutes = DateTime.Now.Minute
                 });
             }
-            
+
             var post = new Post
             {
                 Id = 0,
                 CreateAt = new DateTime(form.Year, form.Month, form.Day, form.Hour, form.Minutes, 0, 0),
-                User = Database.Session.Load<User>(1),
+                User = Auth.User,
                 Title = form.Title,
                 Slug = !string.IsNullOrEmpty(form.Slug) ? form.Slug.UrlFriendly() : form.Title.UrlFriendly(),
                 Excerpt = form.Excerpt,
@@ -152,16 +189,16 @@ namespace Blog.Areas.admin.Controllers
             post.Slug = UniqueSlug.CreateSlug(CheckSlugUnique, post.Slug, post.Id);
             Database.Session.Save(post);
 
-            var postNew = Database.Session.Query<Post>().OrderByDescending(t=>t.Id).FirstOrDefault();
+            var postNew = Database.Session.Query<Post>().OrderByDescending(t => t.Id).FirstOrDefault();
 
-            if (postNew == null) return RedirectToAction("Index");            
+            if (postNew == null) return RedirectToAction("Index");
 
             post.Category = new List<Term>();
 
             post.CreateKeyValue(postNew.Id, "sticky", Request["Sticky"]);
             post.CreateKeyValue(postNew.Id, "keyword", Request["keyword"]);
             post.CreateKeyValue(postNew.Id, "thumbnail_id", Request["image-choose"]);
-                
+
             AddCategoriesTagsPost(postNew, Request["ctags"], Request["categories"]);
 
             TempData["FlashSuccess"] = "Created success!";
@@ -220,7 +257,6 @@ namespace Blog.Areas.admin.Controllers
         {
             var post = Database.Session.Load<Post>(id);
 
-
             if (post == null) return HttpNotFound();
 
             ViewBag.Category = Database.Session.Query<Term>().Where(t => t.Taxonomy == "cat").ToList();
@@ -246,7 +282,7 @@ namespace Blog.Areas.admin.Controllers
                     Category = post.Category
                 });
             }
-            post.User = Database.Session.Load<User>(1);
+            post.User = Auth.User;
 
             post.UpdateAt = new DateTime(form.Year, form.Month, form.Day, form.Hour, form.Minutes, 0, 0);
 
@@ -269,7 +305,7 @@ namespace Blog.Areas.admin.Controllers
             post.CreateKeyValue(post.Id, "thumbnail_id", Request["image-choose"]);
 
             TempData["FlashSuccess"] = "Updated success!";
-            return RedirectToAction("Edit", new {id = id});
+            return RedirectToAction("Edit", new { Id = id });
         }
 
         [HttpPost, ValidateAntiForgeryToken]
@@ -277,7 +313,7 @@ namespace Blog.Areas.admin.Controllers
         {
             var post = Database.Session.Load<Post>(id);
 
-            if (post == null) return HttpNotFound();            
+            if (post == null) return HttpNotFound();
             Database.Session.Update(post);
 
             return RedirectToAction("Index");
@@ -305,11 +341,42 @@ namespace Blog.Areas.admin.Controllers
             var post = Database.Session.Load<Post>(id);
 
             if (post == null) return HttpNotFound();
-            
+
             Database.Session.Update(post);
 
             return RedirectToAction("Index");
 
+        }
+
+
+        /// <summary>
+        /// Xoa cac bai viet co id chua trong listItem
+        /// </summary>
+        public ActionResult DeletePosts()
+        {
+            var listIdPost = Request["DeletePosts"];
+
+            if (string.IsNullOrEmpty(listIdPost)) return RedirectToAction("Index");
+
+            var arraySlug = listIdPost.Split(',').Where(p => p != string.Empty).Distinct().ToArray();
+
+            if (!arraySlug.Any()) return RedirectToAction("Index");
+
+            foreach (var idPost in arraySlug)
+            {
+                long id;
+
+                var flag = long.TryParse(idPost, out id);
+
+                if (!flag) continue;
+
+                var post = Database.Session.Load<Post>(id);
+                if (post == null) continue;
+                Database.Session.Delete(post);
+                Database.Session.Flush();
+            }
+
+            return RedirectToAction("Index");
         }
     }
 }

@@ -15,22 +15,22 @@
         return str;
     }
 
-    $('a[data-post]').click(function (e) {
-        e.preventDefault();
+    $("a[data-post]").click(function (e) {
+        e.preventdefault();
         var $this = $(this);
-        var message = $this.data('post');
+        var message = $this.data("post");
         if (message && !confirm(message)) {
             return;
         }
-        var antiForgeryToken = $('#anti-forgery-form input');
-        var antiForgeryInput = $('<input type="hidden">').attr("name", antiForgeryToken.attr("name"))
-            .val(antiForgeryToken.val());
+        var antiforgerytoken = $('#anti-forgery-form input');
+        var antiforgeryinput = $("<input type=\"hidden\">").attr("name", antiforgerytoken.attr("name"))
+            .val(antiforgerytoken.val());
 
-        $('<form>')
-            .attr('method', 'post')
-            .attr('action', $this.attr('href'))
-            .append(antiForgeryToken)
-            .appendTo(document.body)
+        $("<form>")
+            .attr("method", "post")
+            .attr("action", $this.attr("href"))
+            .append(antiforgerytoken)
+            .appendto(document.body)
             .submit();
     });
 
@@ -45,7 +45,7 @@
             slug = removeUnicode(slug);
             slug = slug.replace(/[^a-zA-Z0-9\s]/g, "");
             slug = slug.replace(/\s+/g, "-");
-            if (slug.charAt(slug.length - 1) == "-")
+            if (slug.charAt(slug.length - 1) === "-")
                 slug = slug.sustr(0, slug.length - 1);
 
             $this.val(slug);
@@ -57,20 +57,19 @@
         return confirm("Are you sure you want to delete?");
     });
 
-    $('#select-all').click(function (event) {
-        if (this.checked) {
-            // Iterate each checkbox
-            $(':checkbox').each(function () {
-                this.checked = true;
-            });
-        }
-        if (!this.checked) {
-            // Iterate each checkbox
-            $(':checkbox').each(function () {
-                this.checked = false;
-            });
-        }
-    });
-
+    //$("#select-all").click(function (event) {
+    //    if (this.checked) {
+    //        // Iterate each checkbox
+    //        $(":checkbox").each(function () {
+    //            this.checked = true;
+    //        });
+    //    }
+    //    if (!this.checked) {
+    //        // Iterate each checkbox
+    //        $(":checkbox").each(function () {
+    //            this.checked = false;
+    //        });
+    //    }
+    //});
 
 });

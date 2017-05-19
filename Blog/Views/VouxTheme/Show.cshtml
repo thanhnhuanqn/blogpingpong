@@ -1,0 +1,16 @@
+﻿@using NHibernate.Linq
+@model Blog.ViewModels.PostsShow
+@{
+    ViewBag.Title = Model.Post.Title;
+    Layout = "~/Views/VouxTheme/_LayoutSite.cshtml";
+}
+<div class="section" id="main">
+    <div class="widget Blog" data-version="1" id="Blog1">
+        @Html.Partial("_Post", Model.Post)
+    </div>
+</div>
+
+
+
+
+

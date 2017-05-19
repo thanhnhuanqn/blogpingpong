@@ -33,12 +33,13 @@ namespace Blog
 
             bundles.Add(new ScriptBundle("~/bundles/froms").Include(
                 "~/Areas/admin/Scripts/forms.js"));
+            
 
-            bundles.Add(new ScriptBundle("~/bundles/ckeditor").Include(
-                "~/Areas/admin/Scripts/ckeditor/ckeditor.js",
-                "~/Areas/admin/Scripts/ckfinder/ckfinder.js"));
+            bundles.Add(new StyleBundle("~/Content/pingpong").Include(
+                "~/Content/site.css",
+                "~/Content/bootstrap-theme.min.css"));
 
-            //BundleTable.EnableOptimizations = true;
+            BundleTable.EnableOptimizations = true;
         }
         
     }

@@ -45,7 +45,7 @@ namespace Blog.Models
             {
                 x.Key(y => y.Column("term_id"));
                 x.Table("term_posts");
-                x.Cascade(Cascade.DeleteOrphans);
+                //x.Cascade(Cascade.DeleteOrphans);
 
             }, x => x.ManyToMany(y =>
             {

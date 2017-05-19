@@ -52,9 +52,8 @@ body {
     color: #444;
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
     font-size: 13px;
-    line-height: 1.4em;
-    min-width: 600px;
-    margin-top: 20px;
+    line-height: 1.4em;    
+    margin-top: 50px;
 }
 h1, h2, h3 {
     color: #23282d;
@@ -238,3 +237,6 @@ ul.categorychecklist li {
     padding: 9px 0 4px;
     line-height: 29px;
 }
+.tablesaw-swipe .tablesaw-cell-persist {
+        border-right: none;
+    }

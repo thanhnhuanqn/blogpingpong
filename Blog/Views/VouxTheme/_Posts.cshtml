@@ -1,0 +1,98 @@
+﻿@using System.Globalization
+@using System.Linq
+@using System.Threading
+@using Blog.Controllers
+@using Blog.Models
+@using Humanizer
+@using NHibernate.Linq
+@model Blog.Infrastructure.PageData<Blog.Models.Post>
+@{
+    Thread.CurrentThread.CurrentUICulture = new CultureInfo("vi-VN"); //Set ngôn ngữ Việt}
+}
+@foreach (var post in Model)
+{
+    <article class="post">
+        <div class="post-header">
+            <span class="cat">
+                @BuilLink(post.Category.Where(t => t.Taxonomy == "cat").ToList(), "tag")
+            </span>
+            <h2>
+                <span>
+                    <a href="@Url.RouteUrl("article", new {post.Slug})">@post.Title</a>
+                </span>
+            </h2>
+        </div>
+        <div id="@post.Id" style="display: block;">
+            @{
+                var meta = post.PostMetas.FirstOrDefault(t => t.PostId == post.Id && t.MetaKey == "thumbnail_id");
+                if (meta != null)
+                {
+                    var image = Database.Session.Load<Post>(long.Parse(meta.MetaValue));
+                    if (image != null)
+                    {
+                        //var d= new ImageController();
+                        //d.Index(image.Guid+ "?675x300");
+                        <div class="post-image">
+                            <a href="@Url.RouteUrl("article", new {post.Slug})">                                
+                                <img alt="@post.Title" src="~/Uploads/Tmp/@image.Guid" class="img-thumbnail" />
+                            </a>
+                        </div>
+                    }
+                }
+            }
+
+            <div class="post-entry">
+                @Html.Raw(post.Excerpt)
+                <p><a class="more-link" href="@Url.RouteUrl("article", new {post.Slug})">Đọc tiếp <i class="fa fa-long-arrow-right"></i></a></p>
+            </div>
+        </div>
+        <div class="post-meta">
+            <div class="post-share1">
+                <a href="#" target="_blank"><div class="sharebox"><i class="fa fa-facebook"></i></div></a>
+                <a href="#" target="_blank"><div class="sharebox"><i class="fa fa-twitter"></i></div></a>
+                <a href="#" target="_blank"><div class="sharebox"><i class="fa fa-pinterest"></i></div></a>
+                <a href="#" target="_blank"><div class="sharebox"><i class="fa fa-google-plus"></i></div></a>
+            </div>
+            <div class="comment_count">
+                <a class="comment-link" href="#">@post.CommentCount bình luận</a>
+            </div>
+            <div class="meta-date">
+                @(TimeSpan.FromMilliseconds((DateTime.Now - post.CreateAt).TotalMilliseconds).Humanize()) bởi <a href="#" rel="author" title="author profile">@post.User.DisplayName</a>
+            </div>
+        </div>
+    </article>
+}
+<div class="clearfix"></div>
+<div class="pagination">
+    @if (Model.HasPreviousPage)
+    {
+        <div class="newer">
+            <a href="@Url.Action(null, new {page = Model.PreviousPage})">
+                <span class="pager-heading">Bài</span><br />
+                <span class="pager-title"> Mới hơn</span>
+                <span class="post-nav-icon"><i class="fa fa-chevron-left"></i></span>
+            </a>
+        </div>
+    }
+    @if (Model.HasNextPage)
+    {
+        <div class="older">
+            <a href="@Url.Action(null, new {page = Model.NextPage})">
+                <span class="pager-heading">Bài</span><br/>
+                <span class="pager-title"> Cũ Hơn</span>
+                <span class="post-nav-icon"><i class="fa fa-chevron-right"></i></span>
+            </a>
+        </div>
+    }
+</div>
+@helper BuilLink(List<Term> list, string typeCat)
+{
+    var i = 0;
+    foreach (var item in list)
+    {
+        if (i != 0)
+        {<text>,</text> }
+            <a class="badge" href="@Url.RouteUrl(typeCat, new { item.Slug})">@item.Name</a>
+        i++;
+    }
+}

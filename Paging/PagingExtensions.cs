@@ -3,7 +3,7 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Web.Mvc.Ajax;
 
-namespace Paging
+namespace Blog.Module.Paging
 {
     public static class PagingExtensions
     {

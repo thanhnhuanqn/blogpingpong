@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <!-- <link rel="shortcut icon" href="/favicon.ico" /> -->
+    <link rel="icon" sizes="16x16" type="image/png" href="~/Content/img/favicon-16x16.png" />
+    <link rel="icon" sizes="32x32" type="image/png" href="~/Content/img/favicon-32x32.png" />
+    <link rel="icon" sizes="48x48" type="image/png" href="~/Content/img/favicon-48x48.png" />
+    <link rel="icon" sizes="128x128" type="image/png" href="~/Content/img/favicon-128x128.png" />
+    @Styles.Render("~/Content/pingpong")
+    <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+    <link href='http://fonts.googleapis.com/css?family=Bad+Script|Raleway:400,500,600,700,300|Lora:400' rel='stylesheet' type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=Montserrat%3A400%2C700&ver=4.2.4' id='default_headings_font-css' media='all' rel='stylesheet' type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=Domine%3A400%2C700&ver=4.2.4' id='default_para_font-css' media='all' rel='stylesheet' type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=Lato%3A300%2C400%2C700%2C400italic&ver=4.2.4' id='default_body_font-css' media='all' rel='stylesheet' type='text/css' />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400&amp;subset=latin-ext,vietnamese" rel="stylesheet">
+    <!--desert, sunburst, sons-of-obsidian, doxy-->
+    <script src="https://rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true&amp;skin=sons-of-obsidian" defer></script>  
+</head>
+<body>
+    @Html.Partial("_Navigation")
+    <div class="container sp_sidebar">
+        <div id="logo">
+        </div>
+        @RenderBody()
+        <div class="section" id="sidebar">
+            @Html.Partial("_SideBar")
+        </div>
+    </div>
+
+    <footer id="footer-copyright">
+        <div class="container">
+            <p>
+                <a href="http://pingpongcode.com/" id="mycontent" title="PingPongCode" ref="dofollow">Ping Pong Code</a> @DateTime.Now.Year
+            </p>
+            <a class="to-top" href="#">Lên đầu trang <i class="fa fa-angle-double-up"></i></a>
+        </div>
+    </footer>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @RenderSection("scripts", required: false)
+    <script>
+        function REinit() {
+            $("pre").addClass("prettyprint");
+        }
+        $(document).ready(function () {
+            REinit();
+        });
+        REinit();
+    </script>
+</body>
+</html>

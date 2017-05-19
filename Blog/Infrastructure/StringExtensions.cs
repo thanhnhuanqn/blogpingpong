@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -84,6 +85,34 @@ namespace Blog.Infrastructure
 
             return title;
 
+        }
+
+        public static string NgayVietBai(this DateTime date)
+        {
+            var ngay = date.ToString("dddd, dd MMMMM yyyy",CultureInfo.InvariantCulture);
+
+            ngay = ngay.Replace("Monday", "T2");
+            ngay = ngay.Replace("Tuesday", "T3");
+            ngay = ngay.Replace("Wednesday", "T4");
+            ngay = ngay.Replace("Thursday", "T5");
+            ngay = ngay.Replace("Friday", "T6");
+            ngay = ngay.Replace("Saturday", "T7");
+            ngay = ngay.Replace("Sunday", "CN");
+
+            ngay = ngay.Replace("January", "Tháng Giêng");
+            ngay = ngay.Replace("February", "Tháng Hai");
+            ngay = ngay.Replace("March", "Tháng Ba");
+            ngay = ngay.Replace("April", "Tháng Tư");
+            ngay = ngay.Replace("May", "Tháng Năm");
+            ngay = ngay.Replace("June", "Tháng Sáu");
+            ngay = ngay.Replace("July", "Tháng Bảy");
+            ngay = ngay.Replace("August", "Tháng Tám");
+            ngay = ngay.Replace("September", "Tháng Chín");
+            ngay = ngay.Replace("October", "Tháng 10");
+            ngay = ngay.Replace("November", "Tháng 11");
+            ngay = ngay.Replace("December", "Tháng 12");
+
+            return ngay;
         }
     }
 }

@@ -7,10 +7,11 @@ using Blog.Areas.admin.ViewModels;
 using Blog.Infrastructure;
 using Blog.Models;
 using NHibernate.Linq;
-using Paging;
+using Blog.Module.Paging;
 
 namespace Blog.Areas.admin.Controllers
 {
+    [Authorize(Roles = "admin")]
     [SelectedTab("page")]
     public class PagesController : Controller
     {
@@ -73,7 +74,7 @@ namespace Blog.Areas.admin.Controllers
             var page = new Post
             {
                 CreateAt = new DateTime(form.Year, form.Month, form.Day, form.Hour, form.Minutes, 0, 0),
-                User = Database.Session.Load<User>(1),
+                User = Auth.User,
                 Title = form.Title,
                 Slug = !String.IsNullOrEmpty(form.Slug) ? form.Slug.UrlFriendly() : form.Title.UrlFriendly(),
                 Excerpt = form.Excerpt,
@@ -138,7 +139,7 @@ namespace Blog.Areas.admin.Controllers
                     Category = null
                 });
             
-            page.User = Database.Session.Load<User>(1);
+            page.User = Auth.User;
 
             page.UpdateAt = new DateTime(form.Year, form.Month, form.Day, form.Hour, form.Minutes, 0, 0);
 

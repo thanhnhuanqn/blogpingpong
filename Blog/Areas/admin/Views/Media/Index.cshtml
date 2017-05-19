@@ -1,9 +1,20 @@
-﻿@model Blog.Areas.admin.ViewModels.PostsIndex
+﻿@model Blog.Module.Paging.IPagedList<Blog.Models.Post>
 @{
     ViewBag.Title = "Image";
 }
 <div class="wrap">
     <h2>Media</h2>
+    @using (Html.BeginForm("Resize", "Media", FormMethod.Post))
+    {
+        <div class="form-group">            
+                <span>Max Width</span>
+                <input name="large_size_w" step="1" min="0" id="large_size_w" class="small-text" type="number">
+                <span>Max Height</span>
+                <input name="large_size_h" step="1" min="0" id="large_size_h" class="small-text" type="number">
+                <input class="btn btn-primary" type="submit" name="Submit" value="Resize changes" />        
+        </div>        
+    }
+   
     @Html.Partial("_FormUpload")
     <div class="view-switch media-grid-view-switch">
         <div class="pull-right">        
@@ -11,7 +22,7 @@
             <a href="@Url.Action("", new {layout = "list"})"><span class="screen-reader-text">List View</span></a>
         </div>
     </div>
-    @Html.Partial("_List", Model.Posts)
+    @Html.Partial("_List", Model)
    
 </div>
 

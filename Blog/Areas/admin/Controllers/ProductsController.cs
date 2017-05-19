@@ -10,6 +10,7 @@ using NHibernate.Linq;
 
 namespace Blog.Areas.admin.Controllers
 {
+    [Authorize(Roles = "admin")]
     [SelectedTab("Products")]
     public class ProductsController : Controller
     {

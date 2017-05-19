@@ -14,7 +14,7 @@ namespace Blog.Infrastructure
 
         public override string[] GetRolesForUser(string username)
         {
-            throw new NotImplementedException();
+            return Auth.User.Roles.Select(role => role.Name).ToArray();
         }
 
         public override void CreateRole(string roleName)

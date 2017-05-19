@@ -1,0 +1,39 @@
+﻿@using Blog.Infrastructure
+@using Blog.Models
+@using NHibernate.Linq
+<div class="widget HTML" data-version="1" id="HTML4">
+    <h2><span>bài viết khác</span></h2>
+    @if (ViewBag.RecenPosts != null)
+    {
+        <ul class="side-newsfeed">
+            @foreach (Post post in ViewBag.RecenPosts)
+            {
+                <li>
+                    <div class="side-item">
+                        @{
+                            var meta = post.PostMetas.FirstOrDefault(t => t.PostId == post.Id && t.MetaKey == "thumbnail_id");
+                            if (meta != null)
+                            {
+                                var image = Database.Session.Load<Post>(long.Parse(meta.MetaValue));
+                                if (image != null)
+                                {                                   
+                                    <div class="side-image">
+                                        <a href="@Url.RouteUrl("article", new {post.Slug})">
+                                            <img width="150" height="100" src="~/Uploads/Thumb/@image.Guid" />
+                                        </a>
+                                    </div>
+                                }
+                            }
+                        }
+                        <div class="side-item-text">
+                            <h4>
+                                <a href="@Url.RouteUrl("article", new {post.Slug})">@post.Title</a>
+                            </h4>
+                            <span class="side-item-meta">@post.CreateAt.NgayVietBai()</span>
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+</div> 

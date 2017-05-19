@@ -1,0 +1,25 @@
+﻿@model Blog.Areas.admin.ViewModels.AuthLogin
+@{
+    ViewBag.Title = "Login";
+    Layout = "../Shared/_LayoutLogin.cshtml";
+}
+
+<div class="login-page">
+    <div class="form">
+        @using (Html.BeginForm("Login", "Auth", FormMethod.Post, new { @class = "login-form" }))
+        {
+            @Html.ValidationSummary()
+            <div>
+                @Html.LabelFor(x => x.UserName)
+                @Html.EditorFor(x => x.UserName)
+            </div>
+
+            <div>
+                @Html.LabelFor(x => x.Password)
+                @Html.EditorFor(x => x.Password)
+            </div>
+            <button>Login</button>
+        }
+
+    </div>
+</div>

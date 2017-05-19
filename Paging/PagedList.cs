@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Paging
+namespace Blog.Module.Paging
 {
     public class PagedList<T> : List<T>, IPagedList<T>
     {

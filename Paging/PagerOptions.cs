@@ -1,7 +1,7 @@
 ﻿using System.Web.Mvc.Ajax;
 using System.Web.Routing;
 
-namespace Paging
+namespace Blog.Module.Paging
 {
     public class PagerOptions
     {
