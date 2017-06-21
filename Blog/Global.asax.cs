@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO.Compression;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -12,6 +14,7 @@ namespace Blog
     {
         protected void Application_Start()
         {
+            //HibernatingRhinos.Profiler.Appender.NHibernate.NHibernateProfiler.Initialize();
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
@@ -19,9 +22,36 @@ namespace Blog
             Database.Configure();
         }
 
-        protected void Application_BeginRequest()
+        protected void Application_BeginRequest(object sender, EventArgs e)
         {
             Database.OpenSession();
+
+            bool allowCompression = false;
+            bool.TryParse(ConfigurationManager.AppSettings["Compression"], out allowCompression);
+
+            if (allowCompression)
+            {
+                // Implement HTTP compression
+                HttpApplication app = (HttpApplication) sender;
+
+                // Retrieve accepted encodings
+                string encodings = app.Request.Headers.Get("Accept-Encoding");
+                if (encodings != null)
+                {
+                    // Check the browser accepts deflate or gzip (deflate takes preference)
+                    encodings = encodings.ToLower();
+                    if (encodings.Contains("deflate"))
+                    {
+                        app.Response.Filter = new DeflateStream(app.Response.Filter, CompressionMode.Compress);
+                        app.Response.AppendHeader("Content-Encoding", "deflate");
+                    }
+                    else if (encodings.Contains("gzip"))
+                    {
+                        app.Response.Filter = new GZipStream(app.Response.Filter, CompressionMode.Compress);
+                        app.Response.AppendHeader("Content-Encoding", "gzip");
+                    }
+                }
+            }
         }
 
         protected void Application_EndRequest()

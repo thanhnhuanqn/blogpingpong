@@ -9,14 +9,14 @@ namespace Blog.Models
 {
     public class Term
     {
-        public virtual Int64 Id { get; set; }
+        public virtual long Id { get; set; }
         public virtual string Name { get; set; }
         public virtual string Slug { get; set; }
         //public virtual int Group { get; set; }
         public virtual string Taxonomy { get; set; }
         public virtual string Description { get; set; }
-        public virtual Int64 Parent { get; set; }
-        public virtual Int64 Count { get; set; }
+        public virtual long Parent { get; set; }
+        public virtual long Count { get; set; }
 
         public virtual IList<Post> Posts { get; set; }
 

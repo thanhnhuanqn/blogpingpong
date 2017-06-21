@@ -39,6 +39,7 @@ namespace Blog
 
             //create session factory
             _sessionFactory = config.BuildSessionFactory();
+            NHibernate.Glimpse.Plugin.RegisterSessionFactory(_sessionFactory);
         }
 
         public static void OpenSession()

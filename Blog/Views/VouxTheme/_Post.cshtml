@@ -1,23 +1,24 @@
 ﻿@using Blog.Infrastructure
 @using Blog.Models
+@using Humanizer
 @using NHibernate.Linq
 @model Blog.Models.Post
-
-<article class="post">
-    <div class="post-header">
+@{
+    var currentURL = Request.Url.Scheme + System.Uri.SchemeDelimiter + Request.Url.Host;
+}
+<main class="post" id="single">
+    <header class="post-header">
         <h1>
             @Model.Title
         </h1>
         <span class="date">@Model.CreateAt.NgayVietBai()</span>
-    </div>
-    <div id="@Model.Id" style="display: block;">
-        <div class="post-entry">
-            <div dir="ltr" style="text-align: left;" trbidi="on">
-                @Html.Raw(Model.Content)
-            </div>
+    </header>
+    <article id="post-@Model.Id">        
+        <div class="post-entry">            
+                @Html.Raw(Model.Content)            
         </div>
-    </div>
-    <div class="entry-meta hidden-print">
+    </article>
+    <footer class="entry-meta hidden-print">
         <div class="single-sharing-btns">
             <h3 class="single-sharing-btns-title">Share This Story</h3>
             <ul class="social-share-buttons style-default size-large" data-url="http://pingpongcode.com">
@@ -44,16 +45,18 @@
         <div class="entry-tags gray-2-secondary">
             <strong class="tag-heading"><i class="fa fa-tag"></i>Tags:</strong>            
             @BuilLink(Model.Category.Where(t => t.Taxonomy == "tag").ToList(), "tag")
-        </div>
-    </div>
-</article>
+        </div>        
+    </footer>  
+    <div class="fb-like" data-href="@currentURL@Url.RouteUrl("article", new {Model.Slug})" data-layout="standard" data-action="like" data-size="small" data-show-faces="true" data-share="true" data-width="600px"></div>
+    <div class="fb-comments" data-numposts="5" data-href="@currentURL@Url.RouteUrl("article", new {Model.Slug})" data-width="100%"></div>
+</main>
 @helper BuilLink(List<Term> list, string typeCat)
 {    
     var i = 0;
     foreach (var item in list)
     {
         if (i != 0) {<text>,</text> }
-        <a class="badge" href="@Url.RouteUrl(typeCat, new { item.Slug})">@item.Name</a>
+        <a href="@Url.RouteUrl(typeCat, new { item.Slug})">@item.Name</a>
         i++;
     }
 }

@@ -9,11 +9,6 @@
     </td>
     <td class="row-title"><a href="@Url.Action("edit", new {Model.Id})">@Model.Title</a></td>
     <td>@Model.User.UserName</td>
-    <td>@Model.CreateAt</td>
-    <td>
-        <a href="@Url.Action("delete", new {Model.Id})" class="btn btn-danger btn-xs" data-post="Are you sure you want to delete this post ?">
-            <i class="glyphicon glyphicon-remove"></i>
-        </a>
-    </td>
+    <td>@Model.CreateAt</td>    
 </tr>
 

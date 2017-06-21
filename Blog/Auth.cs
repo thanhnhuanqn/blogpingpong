@@ -2,11 +2,39 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 using Blog.Models;
 using NHibernate.Linq;
 
 namespace Blog
 {
+    //public class AreaAuthorizeAttribute : AuthorizeAttribute
+    //{
+    //    private readonly string _area;
+
+    //    public AreaAuthorizeAttribute(string area)
+    //    {
+    //        this._area = area;
+    //    }
+
+    //    protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
+    //    {
+    //        var loginUrl = "";
+
+    //        switch (_area)
+    //        {
+    //            case "Admin":
+    //                loginUrl = "~/Admin/Login";
+    //                break;
+    //            case "Members":
+    //                loginUrl = "~/Members/Login";
+    //                break;
+    //        }
+
+    //        filterContext.Result = new RedirectResult(loginUrl + "?returnUrl=" + filterContext.HttpContext.Request.Url.PathAndQuery);
+    //    }
+    //}
+
     public class Auth
     {
         private const string UserKey = "SimpleBlog.Auth.UserKey";

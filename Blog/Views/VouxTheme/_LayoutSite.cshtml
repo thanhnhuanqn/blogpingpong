@@ -3,32 +3,43 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
-    <!-- <link rel="shortcut icon" href="/favicon.ico" /> -->
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Luong Thanh Nhuan, Lương Thanh Nhuận" />    
     <link rel="icon" sizes="16x16" type="image/png" href="~/Content/img/favicon-16x16.png" />
     <link rel="icon" sizes="32x32" type="image/png" href="~/Content/img/favicon-32x32.png" />
     <link rel="icon" sizes="48x48" type="image/png" href="~/Content/img/favicon-48x48.png" />
     <link rel="icon" sizes="128x128" type="image/png" href="~/Content/img/favicon-128x128.png" />
+    @RenderSection("meta", false)
+    <link rel="index" title="ping pong code, pingpongcode, phát triễn web, asp.net mvc, mvc" href="http://pingpongcode.com" />
+    <meta name="google-site-verification" content="lIKdoxJQ98JZ3G-3EC8f-A2S0bzKfhvQmJ5-NPQUo6g" />            
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400&amp;subset=latin-ext,vietnamese" rel="stylesheet">    
     @Styles.Render("~/Content/pingpong")
-    <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
-    <link href='http://fonts.googleapis.com/css?family=Bad+Script|Raleway:400,500,600,700,300|Lora:400' rel='stylesheet' type='text/css' />
-    <link href='http://fonts.googleapis.com/css?family=Montserrat%3A400%2C700&ver=4.2.4' id='default_headings_font-css' media='all' rel='stylesheet' type='text/css' />
-    <link href='http://fonts.googleapis.com/css?family=Domine%3A400%2C700&ver=4.2.4' id='default_para_font-css' media='all' rel='stylesheet' type='text/css' />
-    <link href='http://fonts.googleapis.com/css?family=Lato%3A300%2C400%2C700%2C400italic&ver=4.2.4' id='default_body_font-css' media='all' rel='stylesheet' type='text/css' />
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400&amp;subset=latin-ext,vietnamese" rel="stylesheet">
-    <!--desert, sunburst, sons-of-obsidian, doxy-->
-    <script src="https://rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true&amp;skin=sons-of-obsidian" defer></script>  
+    @*<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-5188322581066797",
+            enable_page_level_ads: true
+        });
+    </script>*@
 </head>
 <body>
     @Html.Partial("_Navigation")
-    <div class="container sp_sidebar">
+    <div class="container">
         <div id="logo">
         </div>
-        @RenderBody()
-        <div class="section" id="sidebar">
-            @Html.Partial("_SideBar")
+    </div>
+    <div class="container sp_sidebar">
+        <div class="row">
+            <div class="col-sm-12 col-md-8">
+                @RenderBody()
+            </div>
+            <div class="col-sm-12 col-md-4">
+                <div id="sidebar">
+                    @Html.Partial("_SideBar")
+                </div>
+            </div>
         </div>
     </div>
-
     <footer id="footer-copyright">
         <div class="container">
             <p>
@@ -38,8 +49,12 @@
         </div>
     </footer>
     @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/jqueryval")
+    @*@Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap")*@
     @RenderSection("scripts", required: false)
+    @Scripts.Render("~/bundles/modernizr")    
+    @*desert, sunburst, sons-of-obsidian, doxy*@
+    <script src="https://rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true&amp;skin=sons-of-obsidian" defer></script>
     <script>
         function REinit() {
             $("pre").addClass("prettyprint");
@@ -48,6 +63,15 @@
             REinit();
         });
         REinit();
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-28002206-2', 'auto');
+        ga('send', 'pageview');
     </script>
 </body>
 </html>

@@ -39,6 +39,8 @@ namespace Blog.Areas.admin.Controllers
 
 
             FormsAuthentication.SetAuthCookie(user.UserName, true);
+
+            Session.Timeout = 60;
             
             if (!string.IsNullOrWhiteSpace(returnUrl))
             {

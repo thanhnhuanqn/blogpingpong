@@ -18,6 +18,15 @@ namespace Blog
 
             var userNamespaces = new[] {typeof(Blog.Controllers.VouxThemeController).Namespace };
 
+            //code moi
+            //routes.MapRoute(
+            //    name: "Default",
+            //    url: "{controller}/{action}/{id}",
+            //    defaults: new { controller = "Posts", action = "Index", id = UrlParameter.Optional },
+            //    namespaces: adminNamespaces
+            //).DataTokens.Add("Area", "Admin");
+
+
             routes.MapRoute(
                name: "Image",
                url: "Image/{imageFile}",
