@@ -28,7 +28,22 @@ namespace Blog.Controllers
 
             return listPost;
         }
-        
+
+        private IEnumerable<SidebarTag> CheckPostPublished()
+        {
+            var term = Database.Session.Query<Term>()
+                .Where(t => t.Taxonomy == "tag" && t.Posts.Count > 0);
+
+            var tags = new List<Term>();
+            foreach (var item in term)
+            {
+                var i = item.Posts;
+                tags.AddRange(from post in i where post.Type == TypePost && post.Status == "publish" && post.CreateAt <= DateTime.Now select item);
+            }
+            return  tags.Distinct().Select(t => new { t.Id, t.Name, t.Slug, PostCount = t.Posts.Count })
+                .Select(tag => new SidebarTag(tag.Id, tag.Name, tag.Slug, tag.PostCount)).OrderByDescending(t=>t.PostCount).ToList();
+
+        }
         // GET: VouxTheme
         public ActionResult Index(int page = 1)
         {            
@@ -52,13 +67,8 @@ namespace Blog.Controllers
 
             var postList = posts.Select(t => new PostsShow(t)).ToList();
 
-            ViewBag.Tags = Database.Session.Query<Term>()
-                .Where(t => t.Taxonomy == "tag")
-                .Select(t => new { t.Id, t.Name, t.Slug, PostCount = t.Posts.Count })
-                .Where(t => t.PostCount > 0)
-                .OrderByDescending(p => p.PostCount)
-                .Select(tag => new SidebarTag(tag.Id, tag.Name, tag.Slug, tag.PostCount)).ToList();
-                        
+            ViewBag.Tags = CheckPostPublished();
+            
             ViewBag.RecentPosts = baseQuery
                .Where(t => !ids.Contains(t.Id))
                .Select(t => new PostsShow(t))
@@ -87,12 +97,7 @@ namespace Blog.Controllers
                .Take(10)
                .ToList();
 
-            ViewBag.Tags = Database.Session.Query<Term>()
-               .Where(t => t.Taxonomy == "tag")
-               .Select(t => new { t.Id, t.Name, t.Slug, PostCount = t.Posts.Count })
-               .Where(t => t.PostCount > 0)
-               .OrderByDescending(p => p.PostCount)
-               .Select(tag => new SidebarTag(tag.Id, tag.Name, tag.Slug, tag.PostCount)).ToList();
+            ViewBag.Tags = ViewBag.Tags = CheckPostPublished();
 
             return View(new PostsShow(post));
         }
@@ -130,12 +135,7 @@ namespace Blog.Controllers
                .Take(10)
                .ToList();
 
-            ViewBag.Tags = Database.Session.Query<Term>()
-               .Where(t => t.Taxonomy == "tag")
-               .Select(t => new { t.Id, t.Name, t.Slug, PostCount = t.Posts.Count })
-               .Where(t => t.PostCount > 0)
-               .OrderByDescending(p => p.PostCount)
-               .Select(ta => new SidebarTag(ta.Id, ta.Name, ta.Slug, ta.PostCount)).ToList();
+            ViewBag.Tags = CheckPostPublished();
 
             var postList = posts.Select(t => new PostsShow(t)).ToList();
 

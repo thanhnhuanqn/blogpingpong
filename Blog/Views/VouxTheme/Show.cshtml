@@ -3,9 +3,10 @@
 @using NHibernate.Linq
 @model Blog.ViewModels.PostsShow
 @{
-    ViewBag.Title = Model.Post.Title;
+    ViewBag.Title = Model.Post.Title.Truncate(65);
     Layout = "~/Views/VouxTheme/_LayoutSite.cshtml";
     var currentURL = Request.Url.Scheme + System.Uri.SchemeDelimiter + Request.Url.Host;
+    ViewBag.TextLogo = Html.Raw("<h2>Ping Pong</h2>");
 }
 <section class="section" id="main">
     <div class="widget Blog">
@@ -16,20 +17,11 @@
     <meta name="title" content="@Model.Post.Title" />
     <meta name="keywords" content="@Model.Post.Title" />
     <meta name="description" content="@Model.Post.Excerpt.Truncate(160)" />
+    <meta property="og:title" content="@Model.Post.Title" />    
     <meta property="og:image" content="@currentURL/uploads/tmp/@Model.PostImage" />
+    <meta property="og:type" content="blog" />
     <meta property="og:url" content="@Request.Url" />
+    <meta property="og:description" content="@Model.Post.Excerpt.Truncate(160)" />
     <link rel="canonical" href="@Request.Url" />
-}
-@section scripts
-{
-    <div id="fb-root"></div>
-    <script>
-        (function (d, s, id) {
-            var js, fjs = d.getElementsByTagName(s)[0];
-            if (d.getElementById(id)) return;
-            js = d.createElement(s); js.id = id;
-            js.src = "//connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v2.9&appId=1324921254288854";
-            fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));
-    </script>
+
 }

@@ -1,7 +1,12 @@
 ﻿@model Blog.ViewModels.PostsIndex
 @{
+    ViewBag.TextLogo = Html.Raw("<h1>Ping Pong</h1>");
     ViewBag.Title = "Ping Pong Code";
     Layout = "~/Views/VouxTheme/_LayoutSite.cshtml";
+}
+@section meta{
+    <meta name="description" content="programming, that's my life, love love love, that's is target my life" />
+    <meta name="keywords" content="asp.net mvc, asp.net core, blog, java, angularjs, typescript, and more ..." />
 }
 <div class="section" id="main">
     <div class="widget Blog">

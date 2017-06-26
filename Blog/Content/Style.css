@@ -157,8 +157,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .post-entry p {
     margin-bottom: 20px;
-    text-align: justify;
-    text-align: center;
+    text-align: justify;    
 }
 
 .post-entry a.more-link {

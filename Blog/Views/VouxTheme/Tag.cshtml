@@ -1,5 +1,6 @@
 ﻿@model Blog.ViewModels.PostsTag
 @{
+    ViewBag.TextLogo = Html.Raw("<h1>Ping Pong</h1>");
     ViewBag.Title = Model.Tag.Name;
     Layout = "~/Views/VouxTheme/_LayoutSite.cshtml";
 }
@@ -18,3 +19,7 @@
         @Html.Partial("_Posts", Model.Posts)
     </div>
 </div>
+@section meta{
+    <meta name="description" content="programming, that's my life, love love love, that's is target my life" />
+    <meta name="keywords" content="asp.net mvc, asp.net core, blog, java, angularjs, typescript, and more ..." />
+}

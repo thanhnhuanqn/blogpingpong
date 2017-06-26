@@ -5,7 +5,7 @@
         @if (ViewBag.Tags != null)
         {
             foreach (var tag in ViewBag.Tags)
-            {
+            {                
                 <span class="label-size label-size-5">
                     <a dir="ltr" href="@Url.RouteUrl("tag", new {slug = tag.Slug})">@tag.Name (@tag.PostCount)</a>
                 </span>
