@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using Blog.ViewModels;
 using Blog.Infrastructure;
@@ -15,41 +14,38 @@ namespace Blog.Controllers
         private const int PostsPerPage = 5;
 
         private const string TypePost = "post";
-
-
-        private static IEnumerable<PostsShow> AddImageToPost(IEnumerable<Post> posts)
+       
+        private static IEnumerable<SidebarTag> CheckPostPublished()
         {
-            var listPost = new List<PostsShow>();
-
-            foreach (var post in posts)
-            {             
-                listPost.Add(new PostsShow(post));
+            var term = Database.Session.Query<Term>()                
+                .Where(o => o.Taxonomy == "tag" && o.Posts.Any(t => t.Type == TypePost && t.Status == "publish" && t.CreateAt <= DateTime.Now))
+                .Distinct();
+            
+            var tags = new List<SidebarTag>();
+            foreach (var item in term)
+            {                
+                tags.Add(new SidebarTag(item.Id, item.Name, item.Slug, item.Posts.GroupBy(a=>a.Id).Count()));
             }
+            return  tags.OrderByDescending(t=>t.PostCount).ToList();
 
-            return listPost;
         }
 
-        private IEnumerable<SidebarTag> CheckPostPublished()
-        {
-            var term = Database.Session.Query<Term>()
-                .Where(t => t.Taxonomy == "tag" && t.Posts.Count > 0);
+        private static IEnumerable<PostsShow> RecentPosts(IQueryable<Post> source, long[] ids, int take)
+        {            
+            var recentPosts = source
+               .Where(t => !ids.Contains(t.Id))
+               .Select(t => new PostsShow(t))
+               .Take(take)
+               .ToList();
 
-            var tags = new List<Term>();
-            foreach (var item in term)
-            {
-                var i = item.Posts;
-                tags.AddRange(from post in i where post.Type == TypePost && post.Status == "publish" && post.CreateAt <= DateTime.Now select item);
-            }
-            return  tags.Distinct().Select(t => new { t.Id, t.Name, t.Slug, PostCount = t.Posts.Count })
-                .Select(tag => new SidebarTag(tag.Id, tag.Name, tag.Slug, tag.PostCount)).OrderByDescending(t=>t.PostCount).ToList();
-
+            return recentPosts;
         }
         // GET: VouxTheme
         public ActionResult Index(int page = 1)
         {            
 
             var baseQuery = Database.Session.Query<Post>()
-                .Where(t => t.Type == TypePost && t.Status =="publish" && t.CreateAt <= DateTime.Now)
+                .Where(t => t.Type == TypePost && t.Status == "publish" && t.CreateAt <= DateTime.Now)
                 .OrderByDescending(t => t.CreateAt);
 
             var totalPostCount = baseQuery.Count();
@@ -68,19 +64,19 @@ namespace Blog.Controllers
             var postList = posts.Select(t => new PostsShow(t)).ToList();
 
             ViewBag.Tags = CheckPostPublished();
-            
-            ViewBag.RecentPosts = baseQuery
-               .Where(t => !ids.Contains(t.Id))
-               .Select(t => new PostsShow(t))
-               .Take(10)
-               .ToList();
+
+            ViewBag.RecentPosts = RecentPosts(baseQuery, ids, 10);
 
             return View(new PostsIndex
             {
                 Posts = new PageData<PostsShow>(postList, totalPostCount, page, PostsPerPage)
             });
         }
-
+        /// <summary>
+        /// Display Single Post
+        /// </summary>
+        /// <param name="slug">Slug of Post</param>
+        /// <returns>Object PostsShow</returns>
         public ActionResult Show(string slug)
         {
             var slugPost = slug.Trim();
@@ -97,26 +93,34 @@ namespace Blog.Controllers
                .Take(10)
                .ToList();
 
-            ViewBag.Tags = ViewBag.Tags = CheckPostPublished();
+            ViewBag.RecentPosts = RecentPosts(baseQuery, new[] { post.Id } , 20);
+
+            ViewBag.Tags = CheckPostPublished();
 
             return View(new PostsShow(post));
         }
-        
+        /// <summary>
+        /// Hiển thị bài viết theo tag
+        /// </summary>
+        /// <param name="slug">slug của tag</param>
+        /// <param name="page">Trang hiện tại</param>
+        /// <returns>Object PostsTag</returns>
         public ActionResult Tag(string slug, int page = 1)
         {            
-
             if (slug == null) return HttpNotFound();
-            var tag = Database.Session.Query<Term>().FirstOrDefault(t => t.Slug == slug);
+
+            var tag = Database.Session.Query<Term>()
+                .FirstOrDefault(o => o.Slug == slug);
 
             if (tag == null) return HttpNotFound();
-            
-            var totalPostCount = tag.Posts.Count();
+
+            var totalPostCount = tag.Posts.GroupBy(t => t.Id).Count();
 
             var postIds = tag.Posts
                 .OrderByDescending(t => t.CreateAt)
                 .Skip((page - 1) * PostsPerPage)
                 .Take(PostsPerPage)
-                .Where(t => t.Type == "post" && t.Status=="publish" && t.CreateAt <= DateTime.Now)
+                .Where(t => t.Type == TypePost && t.Status == "publish" && t.CreateAt <= DateTime.Now)
                 .Select(t => t.Id)
                 .ToArray();
 
@@ -127,18 +131,16 @@ namespace Blog.Controllers
 
             var ids = posts.Select(t => t.Id).ToArray();
 
-            var baseQuery = Database.Session.Query<Post>().Where(t => t.Type == TypePost && t.Status == "publish" && t.CreateAt <= DateTime.Now).OrderByDescending(t => t.CreateAt);
-            
-            ViewBag.RecentPosts = baseQuery
-               .Where(t => !ids.Contains(t.Id))
-               .Select(t => new PostsShow(t))
-               .Take(10)
-               .ToList();
+            var baseQuery = Database.Session.Query<Post>()
+                .Where(t => t.Type == TypePost && t.Status == "publish" && t.CreateAt <= DateTime.Now)
+                .OrderByDescending(t => t.CreateAt);
+                       
+            ViewBag.RecentPosts = RecentPosts(baseQuery, ids, 10);
 
             ViewBag.Tags = CheckPostPublished();
 
             var postList = posts.Select(t => new PostsShow(t)).ToList();
-
+            
             return View(new PostsTag
             {
                 Tag = tag,

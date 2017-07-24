@@ -14,7 +14,7 @@ namespace Blog.Areas.admin.Controllers
     [SelectedTab("Posts")]
     public class TagsController : Controller
     {
-        private string Type = "tag";
+        private readonly string Type = "tag";
 
 
         public bool CheckSlugUnique(long id, string slug)
@@ -63,7 +63,7 @@ namespace Blog.Areas.admin.Controllers
 
             category.Name = form.Name.Trim();
             category.Slug = !string.IsNullOrEmpty(form.Slug) ? form.Slug.UrlFriendly() : form.Name.UrlFriendly();
-            category.Taxonomy = "tag";
+            category.Taxonomy = Type;
             category.Description = form.Description;
 
             category.Slug = UniqueSlug.CreateSlug(CheckSlugUnique, category.Slug, category.Id);
@@ -76,7 +76,7 @@ namespace Blog.Areas.admin.Controllers
 
         public ActionResult Edit(int id)
         {
-            var category = Database.Session.Load<Term>((Int64)id);
+            var category = Database.Session.Load<Term>((long)id);
 
             if (category == null) return HttpNotFound();
 
@@ -93,7 +93,7 @@ namespace Blog.Areas.admin.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult Edit(int id, CategoryNew form)
         {
-            var category = Database.Session.Load<Term>((Int64)id);
+            var category = Database.Session.Load<Term>((long)id);
 
             if (category == null) return HttpNotFound();
 
@@ -119,7 +119,7 @@ namespace Blog.Areas.admin.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult Delete(int id)
         {
-            var category = Database.Session.Load<Term>((Int64)id);
+            var category = Database.Session.Load<Term>((long)id);
 
             if (category == null) return HttpNotFound();
 

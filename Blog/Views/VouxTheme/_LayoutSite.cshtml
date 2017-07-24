@@ -36,21 +36,21 @@
             </div>
         </div>
     </div>
-    <footer id="footer-copyright">
-        <div class="container">
-            <p>
-                <a href="http://pingpongcode.com/" id="mycontent" title="PingPongCode" ref="dofollow">Ping Pong Code</a> @DateTime.Now.Year
-            </p>
-            <a class="to-top" href="#">Lên đầu trang <i class="fa fa-angle-double-up"></i></a>
-        </div>
-    </footer>
+<footer id="footer-copyright">
+    <div class="container">
+        <p>
+            <a href="http://pingpongcode.com/" id="mycontent" title="PingPongCode" ref="dofollow">Ping Pong Code</a> @DateTime.Now.Year
+        </p>
+        <a class="to-top" href="#">Lên đầu trang <i class="fa fa-angle-double-up"></i></a>
+    </div>
+</footer>    
     @Scripts.Render("~/bundles/jquery")
     @*@Scripts.Render("~/bundles/jqueryval")
     @Scripts.Render("~/bundles/bootstrap")*@
     @RenderSection("scripts", required: false)
     @Scripts.Render("~/bundles/modernizr")    
     @*desert, sunburst, sons-of-obsidian, doxy*@
-    <script src="https://rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true&amp;skin=sons-of-obsidian" defer></script>
+    <script src="https://rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true&amp;skin=desert" defer></script>
     <script>
         function REinit() {
             $("pre").addClass("prettyprint");

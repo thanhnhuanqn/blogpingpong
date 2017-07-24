@@ -71,7 +71,7 @@ namespace Blog.Areas.admin.Controllers
             }
             if (Database.Session.Query<User>().Any(u => u.Email == form.Email))
             {
-                ModelState.AddModelError("Email", "Email nay da duoc dang ky!.");
+                ModelState.AddModelError("Email", "This email has been registered");
             }
             if (!ModelState.IsValid)
             {

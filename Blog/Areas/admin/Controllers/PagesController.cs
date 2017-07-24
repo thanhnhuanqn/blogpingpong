@@ -76,7 +76,7 @@ namespace Blog.Areas.admin.Controllers
                 CreateAt = new DateTime(form.Year, form.Month, form.Day, form.Hour, form.Minutes, 0, 0),
                 User = Auth.User,
                 Title = form.Title,
-                Slug = !String.IsNullOrEmpty(form.Slug) ? form.Slug.UrlFriendly() : form.Title.UrlFriendly(),
+                Slug = !string.IsNullOrEmpty(form.Slug) ? form.Slug.UrlFriendly() : form.Title.UrlFriendly(),
                 Excerpt = form.Excerpt,
                 Content = form.Content,
                 Type = TypePost,

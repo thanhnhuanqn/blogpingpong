@@ -3,6 +3,8 @@
 @using Humanizer
 @using NHibernate.Linq
 @model Blog.Models.Post
+@{ var currentURL = Request.Url.Scheme + System.Uri.SchemeDelimiter + Request.Url.Host; }
+
 <main class="post" id="single">
     <header class="post-header">
         <h1>
@@ -44,6 +46,8 @@
             @BuilLink(Model.Category.Where(t => t.Taxonomy == "tag").ToList(), "tag")
         </div>        
     </footer>      
+    <div class="fb-like" data-href="@currentURL@Url.RouteUrl("article", new {Model.Slug})" data-layout="standard" data-action="like" data-size="small" data-show-faces="true" data-share="true" data-width="600px"></div>
+    <div class="fb-comments" data-numposts="5" data-href="@currentURL@Url.RouteUrl("article", new {Model.Slug})" data-width="100%"></div>
 </main>
 @helper BuilLink(List<Term> list, string typeCat)
 {    

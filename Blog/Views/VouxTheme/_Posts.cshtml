@@ -4,6 +4,7 @@
 @using Blog.Controllers
 @using Blog.Models
 @using Humanizer
+@using Humanizer.Localisation
 @using NHibernate.Linq
 @model Blog.Infrastructure.PageData<Blog.ViewModels.PostsShow>
 @{
@@ -56,7 +57,7 @@
                     <a class="comment-link">@post.CommentCount bình luận</a>
                 </div>
                 <div class="meta-date">
-                    @(TimeSpan.FromMilliseconds((DateTime.Now - post.CreateAt).TotalMilliseconds).Humanize()) trước bởi <a title="author profile">@post.User.DisplayName</a>
+                    @(TimeSpan.FromMilliseconds((DateTime.Now - post.CreateAt).TotalMilliseconds).Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Year)) trước bởi <a title="author profile">@post.User.DisplayName</a>
                 </div>
             </div>
         </article>

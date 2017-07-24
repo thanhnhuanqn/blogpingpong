@@ -51,7 +51,11 @@ namespace Blog.Areas.admin.Controllers
 
             return RedirectToAction("Index");
         }
-
+        /// <summary>
+        /// Name of Menu, ex: PrimaryMenu, SecondaryMenu
+        /// </summary>
+        /// <param name="id">Identity of this menu</param>
+        /// <returns>Nav</returns>
         public ActionResult Menu(int id)
         {
             var menu = Database.Session.Load<Term>((long)id);

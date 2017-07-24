@@ -38,7 +38,7 @@ namespace Blog.Areas.admin.Controllers
 
             var baseQuery = Database.Session.Query<Post>().Where(t=>t.Type== PostType).OrderByDescending(c => c.CreateAt);
          
-            int currentPageIndex = page.HasValue ? page.Value - 1 : 0;
+            var currentPageIndex = page.HasValue ? page.Value - 1 : 0;
 
             return View(baseQuery.ToPagedList(currentPageIndex, DefaultPageSize));
 
@@ -70,24 +70,23 @@ namespace Blog.Areas.admin.Controllers
         }
         public void DeleteListImage(string listItem)
         {
-            if (!string.IsNullOrEmpty(listItem))
+            if (string.IsNullOrEmpty(listItem)) return;
+
+            var items = listItem.Split(',').Where(p => p != string.Empty).ToList();
+
+            foreach (var item in items)
             {
-                var items = listItem.Split(',').Where(p => p != string.Empty).ToList();
-                foreach (var item in items)
-                {
-                    var getImage = Database.Session.Load<Post>(Int64.Parse(item));
+                var getImage = Database.Session.Load<Post>(Int64.Parse(item));
 
-                    if (getImage != null)
-                    {
-                        DeleteFile(getImage.Guid, "~/Uploads/");
-                        DeleteFile(getImage.Guid, "~/Uploads/thumb/");
-                        DeleteFile(getImage.Guid, "~/Uploads/medium/");
-                        DeleteFile(getImage.Guid, "~/Uploads/large/");
-                    }
-                }
+                if (getImage == null) continue;
 
-                //DeleteList(listItem);
+                DeleteFile(getImage.Guid, "~/Uploads/");
+                DeleteFile(getImage.Guid, "~/Uploads/thumb/");
+                DeleteFile(getImage.Guid, "~/Uploads/medium/");
+                DeleteFile(getImage.Guid, "~/Uploads/large/");
             }
+
+            //DeleteList(listItem);
         }
 
         public void DeleteFile(string file, string folder)
@@ -96,14 +95,13 @@ namespace Blog.Areas.admin.Controllers
 
             var fileName = file;
 
-            if (location != null)
+            if (location == null) return;
+
+            var path = Path.Combine(location, fileName);
+            FileInfo fileOrg = new FileInfo(path);
+            if (fileOrg.Exists)
             {
-                var path = Path.Combine(location, fileName);
-                FileInfo fileOrg = new FileInfo(path);
-                if (fileOrg.Exists)
-                {
-                    fileOrg.Delete();
-                }
+                fileOrg.Delete();
             }
         }
         private readonly string folderUpload = @"~\Uploads\";
@@ -112,7 +110,7 @@ namespace Blog.Areas.admin.Controllers
             var imageFileName = "";
 
             
-            for (int i = 0; i < numFiles.Count; i++)
+            for (var i = 0; i < numFiles.Count; i++)
             {
                 var file = numFiles[i];
                 if (file.ContentLength > 0)
@@ -181,16 +179,16 @@ namespace Blog.Areas.admin.Controllers
 
             try
             {
-                int left = 0;
-                int top = 0;
+                var left = 0;
+                var top = 0;
                 int srcWidth;
                 int srcHeight;
 
                 var bitmap = new System.Drawing.Bitmap(Width, Height);
 
-                double croppedHeightToWidth = (double)Height / Width;
+                var croppedHeightToWidth = (double)Height / Width;
 
-                double croppedWidthToHeight = (double)Width / Height;
+                var croppedWidthToHeight = (double)Width / Height;
 
                 if (image.Width > image.Height)
                 {
@@ -223,7 +221,7 @@ namespace Blog.Areas.admin.Controllers
                     }
                 }
 
-                using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bitmap))
+                using (var g = System.Drawing.Graphics.FromImage(bitmap))
                 {
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
                     g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
@@ -240,16 +238,16 @@ namespace Blog.Areas.admin.Controllers
             }
 
             var folderSave = System.Web.HttpContext.Current.Server.MapPath(folderSaveFile);
-            if (folderSave != null)
-            {
-                var pathFinal = Path.Combine(folderSave, file_name);
 
-                MemoryStream ms = new MemoryStream();
-                finalImage.Save(ms, image.RawFormat);
-                var img = new WebImage(ms.GetBuffer());
-                img.Resize(Width, Height);
-                img.Save(pathFinal, img.ImageFormat);
-            }
+            if (folderSave == null) return;
+
+            var pathFinal = Path.Combine(folderSave, file_name);
+
+            var ms = new MemoryStream();
+            finalImage.Save(ms, image.RawFormat);
+            var img = new WebImage(ms.GetBuffer());
+            img.Resize(Width, Height);
+            img.Save(pathFinal, img.ImageFormat);
         }
 
         [HttpPost]

@@ -132,16 +132,15 @@
 </div>
 @helper BuilLink(List<Term> list, string typeCat)
 {
+    var sb = string.Empty;
+    var i = 0;
+    foreach (var item in list)
+    {
+        if (i != 0) { sb += ", "; }
 
-var sb = string.Empty;
-var i = 0;
-foreach (var item in list)
-{
-    if (i != 0) { sb += ", "; }
-
-    sb += "<a href=\"?" + typeCat + "=" + item.Id + "\">" + item.Name + "</a>";
-    i++;
-}
+        sb += "<a href=\"?" + typeCat + "=" + item.Id + "\">" + item.Name + "</a>";
+        i++;
+    }
     @Html.Raw(sb)
 }
 

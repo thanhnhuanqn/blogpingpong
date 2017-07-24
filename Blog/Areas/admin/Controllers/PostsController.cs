@@ -35,17 +35,17 @@ namespace Blog.Areas.admin.Controllers
         {
             var currentPageIndex = page - 1 ?? 0;
 
-            var posts = Database.Session.Query<Post>().Where(t => t.Type == "post");
+            var posts = Database.Session.Query<Post>().Where(t => t.Type == PostType);
 
             if (!string.IsNullOrEmpty(status))
-                posts = Database.Session.Query<Post>().Where(t => t.Type == "post" && t.Status == status.Trim());
+                posts = Database.Session.Query<Post>().Where(t => t.Type == PostType && t.Status == status.Trim());
 
             if (category != null)
             {
                 var cat = Database.Session.Load<Term>(long.Parse(category));
                 if (cat != null)
                 {
-                    posts = Database.Session.Query<Post>().Where(t => t.Type == "post" && t.Category.Contains(cat));
+                    posts = Database.Session.Query<Post>().Where(t => t.Type == PostType && t.Category.Contains(cat));
                 }
             }
 
@@ -54,7 +54,7 @@ namespace Blog.Areas.admin.Controllers
                 var cat = Database.Session.Load<Term>(long.Parse(tag));
                 if (cat != null)
                 {
-                    posts = Database.Session.Query<Post>().Where(t => t.Type == "post" && t.Category.Contains(cat));
+                    posts = Database.Session.Query<Post>().Where(t => t.Type == PostType && t.Category.Contains(cat));
                 }
             }
 
@@ -63,13 +63,13 @@ namespace Blog.Areas.admin.Controllers
                 var userPost = Database.Session.Load<User>(int.Parse(user));
                 if (userPost != null)
                 {
-                    posts = Database.Session.Query<Post>().Where(t => t.Type == "post" && t.User.Id == userPost.Id);
+                    posts = Database.Session.Query<Post>().Where(t => t.Type == PostType && t.User.Id == userPost.Id);
                 }
             }
 
             if (!string.IsNullOrEmpty(search))
             {
-                posts = Database.Session.Query<Post>().Where(t => t.Type == "post" && t.Title.Contains(search));
+                posts = Database.Session.Query<Post>().Where(t => t.Type == PostType && t.Title.Contains(search));
             }
 
 
@@ -104,6 +104,7 @@ namespace Blog.Areas.admin.Controllers
                     if (string.IsNullOrWhiteSpace(tag.Trim())) continue;
 
                     var t = Database.Session.Query<Term>().SingleOrDefault(x => x.Slug == tag.UrlFriendly());
+
                     if (t != null)
                     {
                         tags.Add(t);
@@ -232,6 +233,9 @@ namespace Blog.Areas.admin.Controllers
             {
                 keyw = keyword.MetaValue;
             }
+
+            if (post.UpdateAt != null) post.CreateAt = post.UpdateAt.Value;
+
             return View(new PostsForm
             {
                 Id = id,

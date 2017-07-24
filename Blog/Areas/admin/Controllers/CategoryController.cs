@@ -35,6 +35,7 @@ namespace Blog.Areas.admin.Controllers
                 Category = Database.Session.Query<Term>().Where(t=>t.Taxonomy == "cat").ToList()
             });
         }
+
         public ActionResult New()
         {
             return View(new CategoryNew
