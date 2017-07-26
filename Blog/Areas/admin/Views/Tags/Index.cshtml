@@ -2,6 +2,10 @@
 @{
     ViewBag.Title = "Manager Tags";
 }
+<link href="~/Areas/admin/Scripts/tablesaw/tablesaw.css" rel="stylesheet" />
+<script src="~/Areas/admin/Scripts/tablesaw/tablesaw.jquery.js"></script>
+<script src="~/Areas/admin/Scripts/tablesaw/tablesaw-init.js"></script>
+
 <div class="wrap">
     <h1>Tags</h1>
     <div class="btn-toolbar">
@@ -10,39 +14,60 @@
         </a>
     </div>
     <br />
-    <table class="table table-hover widefat table-responsive fixed">
+   
+@using (Html.BeginForm("DeleteTags", "Tags", FormMethod.Post))
+{
+    @AntiForgery.GetHtml()
+    <div class="nav nav-pills">
+        <div class="row">
+            <div class="col-md-8 col-xs-6">
+                <div class="dropdown" role="presentation">
+                    <button class="btn btn-default btn-sm" type="button" id="dd-menu" data-toggle="dropdown">
+                        Action <span class="caret"></span>
+                    </button>
+                    <div class="dropdown-menu" role="menu">
+                        <div role="presentation">
+                            <a href="@Url.Action("New")" class="btn btn-link">
+                                <span class="glyphicon glyphicon-new-window"></span> Add new
+                            </a>
+                        </div>
+                        <div role="presentation">
+                            <button class="btn btn-link" type="submit" value="btnDelAll" id="deleteActionRun" name="deleteActionRun" role="menuitem" tabindex="-1">
+                                <span class="glyphicon glyphicon-remove"></span> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-xs-6">
+                <div class="nav-text text-right">
+                    <p>Have all @Model.Category.Count @(Model.Category.Count > 1 ? "items" : "item")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <table data-tablesaw-sortable class="tablesaw table table-hover widefat fixed">
         <thead>
-            <tr>
-                <th class="check-column">
-                    <input type="checkbox" name="actionDelete" value="all" id="select-all" />
-                </th>
-                <th>Name</th>
-                <th class="column-slug">Slug</th>
-                <th class="column-description">Description</th>
-                <th class="column-posts">Count</th>
-                <th>Actions</th>
-            </tr>
+        <tr>
+            <th scope="col"><input data-tablesaw-checkall type="checkbox"></th>
+            <th>Name</th>
+            <th class="column-slug">Slug</th>
+            <th class="column-description">Description</th>
+            <th class="column-posts">Count</th>
+        </tr>
         </thead>
         @foreach (var tag in Model.Category)
-            {
+        {
             <tr>
-                <td class="check-column"><input type="checkbox" name="actionDelete" value="@tag.Slug" /> </td>
+                <td><input name="DeleteTags" value="@tag.Id" id="checkbox-@tag.Id" type="checkbox" /></td>
                 <td><a href="@Url.Action("edit", new {tag.Id})">@tag.Name</a></td>
                 <td>@tag.Slug</td>
                 <td>@tag.Description</td>
                 <td>@tag.Count</td>
-                <td>
-                    <div class="btn-group" style="min-width: 111px;">
-                        <a href="@Url.Action("edit", new {tag.Id})" class="btn btn-xs btn-primary">
-                            <i class="glyphicon glyphicon-edit"></i> Edit
-                        </a>
-                        <a href="@Url.Action("Delete", new { tag.Id })" class="btn btn-xs btn-danger"
-                           data-post="Are you sure you want to delete '@tag.Name'">
-                            <i class="glyphicon glyphicon-remove"></i> Delete
-                        </a>
-                    </div>
-                </td>
             </tr>
         }
+        
     </table>
+}
 </div>

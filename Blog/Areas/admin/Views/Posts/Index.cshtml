@@ -3,6 +3,7 @@
 @using Blog.Models
 @using Blog.Module.Paging
 @using Humanizer
+@using Humanizer.Localisation
 @model IPagedList<Post>
 @{
     ViewBag.Title = "Manager posts";
@@ -114,7 +115,7 @@
                                 <td>@BuilLink(item.Category.Where(t => t.Taxonomy == "cat").ToList(), "category")</td>
                                 <td>@BuilLink(item.Category.Where(t => t.Taxonomy == "tag").ToList(), "tag")</td>
                                 <td>@item.CommentCount</td>
-                                <td><abbr title="@item.CreateAt.ToString("dd/MM/yy hh:mm")">@(TimeSpan.FromMilliseconds((DateTime.Now - item.CreateAt).TotalMilliseconds).Humanize())</abbr></td>
+                                <td><abbr title="@item.CreateAt.ToString("dd/MM/yy hh:mm")">@(TimeSpan.FromMilliseconds((DateTime.Now - item.CreateAt).TotalMilliseconds).Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Year))</abbr></td>
                             </tr>
                         }
                     </tbody>

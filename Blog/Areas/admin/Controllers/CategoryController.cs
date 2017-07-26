@@ -114,12 +114,12 @@ namespace Blog.Areas.admin.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Delete(long id)
+        //        [HttpPost, ValidateAntiForgeryToken]
+        private void Delete(long id)
         {
             var category = Database.Session.Load<Term>(id);
 
-            if (category == null) return HttpNotFound();
+            if (category == null) return ;
             
             Database.Session.Delete(category);
             Database.Session.Flush();
@@ -132,9 +132,36 @@ namespace Blog.Areas.admin.Controllers
                 Database.Session.Update(term);
                 Database.Session.Flush();
             }
-            
-            return RedirectToAction("Index");
+        }
 
+
+
+        /// <summary>
+        /// Xoa cac bai viet co id chua trong listItem
+        /// </summary>
+        [HttpPost, ValidateAntiForgeryToken]
+        public ActionResult DeleteCats()
+        {
+            var listIdPost = Request["DeletePosts"];
+
+            if (string.IsNullOrEmpty(listIdPost)) return RedirectToAction("Index");
+
+            var arraySlug = listIdPost.Split(',').Where(p => p != string.Empty).Distinct().ToArray();
+
+            if (!arraySlug.Any()) return RedirectToAction("Index");
+
+            foreach (var idPost in arraySlug)
+            {
+                long id;
+
+                var flag = long.TryParse(idPost, out id);
+
+                if (!flag) continue;
+
+                Delete(id);
+            }
+
+            return RedirectToAction("Index");
         }
     }
 }

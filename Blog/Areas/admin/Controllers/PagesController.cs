@@ -90,7 +90,7 @@ namespace Blog.Areas.admin.Controllers
         }
 
 
-        public ActionResult Edit(int id)
+        public ActionResult Edit(long id)
         {
             //var post = Database.Session.Load<Post>((Int64)id);
             var page = Database.Session.Query<Post>().SingleOrDefault(t => t.Id == id);
@@ -116,9 +116,9 @@ namespace Blog.Areas.admin.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, PostsForm form)
+        public ActionResult Edit(long id, PostsForm form)
         {
-            var page = Database.Session.Load<Post>((Int64)id);
+            var page = Database.Session.Load<Post>(id);
             
             if (page == null) return HttpNotFound();            
 
@@ -159,32 +159,41 @@ namespace Blog.Areas.admin.Controllers
             return RedirectToAction("Index");
         }
 
-
-
-        [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Trash(int id)
+        
+        private static void Delete(long id)
         {
-            var page = Database.Session.Load<Post>((Int64)id);
-
-            if (page == null) return HttpNotFound();
-            
-            Database.Session.Update(page);
-
-            return RedirectToAction("Index");
-
+            var page = Database.Session.Load<Post>(id);
+            if (page == null) return;
+            Database.Session.Delete(page);
+            Database.Session.Flush();            
         }
 
+        /// <summary>
+        /// Xoa cac bai viet co id chua trong listItem
+        /// </summary>
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Delete(int id)
+        public ActionResult DeletePages()
         {
-            var page = Database.Session.Load<Post>((Int64)id);
+            var listIdPost = Request["DeletePages"];
 
-            if (page == null) return HttpNotFound();
+            if (string.IsNullOrEmpty(listIdPost)) return RedirectToAction("Index");
 
-            Database.Session.Delete(page);
-            Database.Session.Flush();
+            var arraySlug = listIdPost.Split(',').Where(p => p != string.Empty).Distinct().ToArray();
+
+            if (!arraySlug.Any()) return RedirectToAction("Index");
+
+            foreach (var idPost in arraySlug)
+            {
+                long id;
+
+                var flag = long.TryParse(idPost, out id);
+
+                if (!flag) continue;
+
+                Delete(id);
+            }
+
             return RedirectToAction("Index");
-
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Blog.Areas.admin.Controllers
     [SelectedTab("Posts")]
     public class TagsController : Controller
     {
-        private readonly string Type = "tag";
+        private const string Type = "tag";
 
 
         public bool CheckSlugUnique(long id, string slug)
@@ -34,7 +34,7 @@ namespace Blog.Areas.admin.Controllers
         {
             return View(new CategoryIndex
             {
-                Category = Database.Session.Query<Term>().Where(t => t.Taxonomy == Type).ToList()
+                Category = Database.Session.Query<Term>().Where(t => t.Taxonomy == Type).OrderByDescending(t=>t.Id).ToList()
             });
         }
         public ActionResult New()
@@ -116,17 +116,45 @@ namespace Blog.Areas.admin.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Delete(int id)
+        
+        private static void Delete(long id)
         {
-            var category = Database.Session.Load<Term>((long)id);
+            var category = Database.Session.Load<Term>(id);
 
-            if (category == null) return HttpNotFound();
+            if (category == null) return ;
 
             Database.Session.Delete(category);
-            Database.Session.Flush();
-            return RedirectToAction("Index");
+            Database.Session.Flush();           
 
+        }
+
+
+        /// <summary>
+        /// Xoa cac bai viet co id chua trong listItem
+        /// </summary>
+        [HttpPost, ValidateAntiForgeryToken]
+        public ActionResult DeleteTags()
+        {
+            var listIdPost = Request["DeleteTags"];
+
+            if (string.IsNullOrEmpty(listIdPost)) return RedirectToAction("Index");
+
+            var arraySlug = listIdPost.Split(',').Where(p => p != string.Empty).Distinct().ToArray();
+
+            if (!arraySlug.Any()) return RedirectToAction("Index");
+
+            foreach (var idPost in arraySlug)
+            {
+                long id;
+
+                var flag = long.TryParse(idPost, out id);
+
+                if (!flag) continue;
+
+                Delete(id);
+            }
+
+            return RedirectToAction("Index");
         }
     }
 }

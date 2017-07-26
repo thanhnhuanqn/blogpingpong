@@ -315,6 +315,7 @@
     <Content Include="Areas\admin\Contents\admin.css" />
     <Content Include="Areas\admin\Contents\login.css" />
     <Content Include="Content\img\me.jpg" />
+    <Content Include="Content\pingpongstylecode.css" />
     <Content Include="Content\prism.css" />
     <Content Include="Content\Style.css" />
     <Content Include="Scripts\jquery.timeago.js" />
