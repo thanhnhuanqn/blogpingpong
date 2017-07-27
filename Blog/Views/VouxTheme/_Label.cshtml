@@ -1,10 +1,11 @@
-﻿@using Blog.ViewModels
+﻿@using Blog.Models
+@using Blog.ViewModels
 <div class="widget Label">
     <h2><span>nhãn</span></h2>
     <div class="widget-content cloud-label-widget-content">
         @if (ViewBag.Tags != null)
         {
-            foreach (var tag in ViewBag.Tags)
+            foreach (LabelVoux tag in ViewBag.Tags)
             {                
                 <span class="label-size label-size-5">
                     <a dir="ltr" href="@Url.RouteUrl("tag", new {slug = tag.Slug})">@tag.Name (@tag.PostCount)</a>

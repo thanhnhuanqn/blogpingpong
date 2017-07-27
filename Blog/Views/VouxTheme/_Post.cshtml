@@ -2,7 +2,7 @@
 @using Blog.Models
 @using Humanizer
 @using NHibernate.Linq
-@model Blog.Models.Post
+@model Blog.Models.PostVoux
 @{ var currentURL = Request.Url.Scheme + System.Uri.SchemeDelimiter + Request.Url.Host; }
 
 <main class="post" id="single">
@@ -10,7 +10,7 @@
         <h1>
             @Model.Title
         </h1>
-        <span class="date">@Model.CreateAt.NgayVietBai()</span>
+        <span class="date">@Model.Created.NgayVietBai()</span>
     </header>
     <article id="post-@Model.Id">        
         <div class="post-entry">            
@@ -43,13 +43,13 @@
         </div>
         <div class="entry-tags gray-2-secondary">
             <strong class="tag-heading"><i class="fa fa-tag"></i>Tags:</strong>            
-            @BuilLink(Model.Category.Where(t => t.Taxonomy == "tag").ToList(), "tag")
+            @BuilLink(Model.Tags, "tag")
         </div>        
     </footer>      
     <div class="fb-like" data-href="@currentURL@Url.RouteUrl("article", new {Model.Slug})" data-layout="standard" data-action="like" data-size="small" data-show-faces="true" data-share="true" data-width="600px"></div>
     <div class="fb-comments" data-numposts="5" data-href="@currentURL@Url.RouteUrl("article", new {Model.Slug})" data-width="100%"></div>
 </main>
-@helper BuilLink(List<Term> list, string typeCat)
+@helper BuilLink(List<LabelVoux> list, string typeCat)
 {    
     var i = 0;
     foreach (var item in list)

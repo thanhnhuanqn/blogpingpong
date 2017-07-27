@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
 using System.Linq;
 using System.Web.Mvc;
 using Blog.ViewModels;
 using Blog.Infrastructure;
 using Blog.Models;
+using Dapper;
+using MySql.Data.MySqlClient;
 using NHibernate.Linq;
 
 namespace Blog.Controllers
@@ -14,62 +18,70 @@ namespace Blog.Controllers
         private const int PostsPerPage = 5;
 
         private const string TypePost = "post";
-       
-        private static IEnumerable<SidebarTag> CheckPostPublished()
+
+        private readonly IDbConnection _db = new MySqlConnection(ConfigurationManager.ConnectionStrings["MySqlServerConnString"].ConnectionString);        
+
+        private IEnumerable<PostsRecentVoux> RecentVouexPosts(IEnumerable<long> ids, int take)
+        {            
+            var query =
+                "SELECT id, title, slug, created_at as created, updated_at as updated " +
+                "FROM posts " +
+                "WHERE type ='post' and status = 'publish' AND id NOT IN (" + string.Join(",", ids) + ") " +
+                "ORDER BY id DESC " +
+                "LIMIT " + take;
+
+            return _db.Query<PostsRecentVoux>(query);
+        }
+
+        private IEnumerable<LabelVoux> GetTags()
         {
-            var term = Database.Session.Query<Term>()                
-                .Where(o => o.Taxonomy == "tag" && o.Posts.Any(t => t.Type == TypePost && t.Status == "publish" && t.CreateAt <= DateTime.Now))
-                .Distinct();
-            
-            var tags = new List<SidebarTag>();
-            foreach (var item in term)
-            {                
-                tags.Add(new SidebarTag(item.Id, item.Name, item.Slug, item.Posts.GroupBy(a=>a.Id).Count()));
-            }
-            return  tags.OrderByDescending(t=>t.PostCount).ToList();
+            var query =
+                "SELECT t.id, t.name, t.slug, count(*) AS PostCount " +
+                "FROM term_posts tp, posts p, terms t " +
+                "WHERE tp.post_id = p.id " +
+                    "AND t.id = tp.term_id " +
+                    "AND t.taxonomy = 'tag' " +
+                    "AND p.type = 'post' " +
+                    "AND p.status = 'publish' " +
+                "GROUP BY t.id, t.name " +
+                "ORDER BY PostCount DESC" 
+                ;
 
+            return _db.Query<LabelVoux>(query);
         }
-
-        private static IEnumerable<PostsShow> RecentPosts(IQueryable<Post> source, long[] ids, int take)
-        {            
-            var recentPosts = source
-               .Where(t => !ids.Contains(t.Id))
-               .Select(t => new PostsShow(t))
-               .Take(take)
-               .ToList();
-
-            return recentPosts;
-        }
-        // GET: VouxTheme
         public ActionResult Index(int page = 1)
-        {            
+        {
 
-            var baseQuery = Database.Session.Query<Post>()
-                .Where(t => t.Type == TypePost && t.Status == "publish" && t.CreateAt <= DateTime.Now)
-                .OrderByDescending(t => t.CreateAt);
+            var queryCountPost =
+                "SELECT count(*) " +
+                "FROM posts " +
+                "WHERE type ='post' and status = 'publish'";//and created_at <= " + DateTime.Now;
 
-            var totalPostCount = baseQuery.Count();
-            var postIds = baseQuery.Skip((page - 1) * PostsPerPage)
-                .Take(PostsPerPage)
-                .Select(t => t.Id).ToArray();
+            var totalPostCount = _db.Query<int>(queryCountPost).Single();
 
-            var posts = baseQuery
-                .Where(t => postIds.Contains(t.Id))
-                .ToList();
+            var query =
+                "SELECT users.display_name as username, posts.id, title, posts.slug, excerpt, created_at as created, updated_at as updated, type, posts.status, user_id as userid " +
+                "FROM posts " +
+                "LEFT JOIN users ON (users.id = posts.user_id) " +
+                "WHERE type ='post' and posts.status = 'publish' " +
+                "ORDER BY id DESC " +
+                "LIMIT " + PostsPerPage + " OFFSET " + (page -1) * PostsPerPage;
+                        
+            var posts = (List<PostVoux>)_db.Query<PostVoux>(query);
 
             var ids = posts
                 .Select(t => t.Id)
-                .ToArray();            
+                .ToArray();
 
-            var postList = posts.Select(t => new PostsShow(t)).ToList();
+            ViewBag.RecentPosts = RecentVouexPosts(ids, 10);
 
-            ViewBag.Tags = CheckPostPublished();
+            ViewBag.Tags = GetTags();
 
-            ViewBag.RecentPosts = RecentPosts(baseQuery, ids, 10);
-
-            return View(new PostsIndex
+            var postList = posts.Select(t => new PostsVouxShow(t)).ToList();
+                        
+            return View(new PostsVouxIndex
             {
-                Posts = new PageData<PostsShow>(postList, totalPostCount, page, PostsPerPage)
+                Posts = new PageData<PostsVouxShow>(postList, totalPostCount, page, PostsPerPage)
             });
         }
         /// <summary>
@@ -81,23 +93,19 @@ namespace Blog.Controllers
         {
             var slugPost = slug.Trim();
 
-            var post = Database.Session.Query<Post>().FirstOrDefault(t => t.Slug == slugPost);
+            var query = "SELECT id, title, slug, excerpt, content, created_at as created, updated_at as updated " +
+                        "from posts p " +
+                        "WHERE status='publish' and type='post' and slug = '" + slugPost + "'";
 
-            if (post == null || post.Status != "publish" || post.CreateAt > DateTime.Now) return HttpNotFound();
-            
-            var baseQuery = Database.Session.Query<Post>().Where(t => t.Type == TypePost && t.Status == "publish" && t.CreateAt <= DateTime.Now).OrderByDescending(t => t.CreateAt);
-            
-            ViewBag.RecentPosts = baseQuery
-               .Where(t => t.Id != post.Id)
-               .Select(t => new PostsShow(t))
-               .Take(10)
-               .ToList();
+            var post = _db.Query<PostVoux>(query).SingleOrDefault();
 
-            ViewBag.RecentPosts = RecentPosts(baseQuery, new[] { post.Id } , 20);
+            if (post == null) return HttpNotFound();            
 
-            ViewBag.Tags = CheckPostPublished();
+            ViewBag.RecentPosts = RecentVouexPosts(new []{post.Id}, 10);
 
-            return View(new PostsShow(post));
+            ViewBag.Tags = GetTags();
+
+            return View(new PostsVouxShow(post));
         }
         /// <summary>
         /// Hiển thị bài viết theo tag
@@ -106,45 +114,53 @@ namespace Blog.Controllers
         /// <param name="page">Trang hiện tại</param>
         /// <returns>Object PostsTag</returns>
         public ActionResult Tag(string slug, int page = 1)
-        {            
-            if (slug == null) return HttpNotFound();
+        {
+            var slugTag = slug.Trim();
 
-            var tag = Database.Session.Query<Term>()
-                .FirstOrDefault(o => o.Slug == slug);
+            var query = "select * from terms t where t.slug = '" + slugTag + "'";
+
+            var tag = _db.Query<LabelVoux>(query).SingleOrDefault();
 
             if (tag == null) return HttpNotFound();
 
-            var totalPostCount = tag.Posts.GroupBy(t => t.Id).Count();
+            var queryCount =
+                "SELECT count(*) " +
+                "FROM term_posts tp, terms t, posts p " +
+                "LEFT JOIN users ON(users.id = p.user_id) " +
+                "WHERE tp.post_id = p.id " +
+                    "AND t.id = tp.term_id " +
+                    "AND p.status = 'publish' " +
+                    "AND p.type = 'post' and t.id = " + tag.Id;
 
-            var postIds = tag.Posts
-                .OrderByDescending(t => t.CreateAt)
-                .Skip((page - 1) * PostsPerPage)
-                .Take(PostsPerPage)
-                .Where(t => t.Type == TypePost && t.Status == "publish" && t.CreateAt <= DateTime.Now)
+            var totalPostCount = _db.Query<int>(queryCount).SingleOrDefault();
+
+            var queryMain =
+               "SELECT users.display_name as username, p.id, title, p.slug, excerpt, content, created_at as created, " +
+                       "updated_at as updated, type, p.status, user_id as userid " +
+               "FROM term_posts tp, terms t, posts p " +
+               "LEFT JOIN users ON(users.id = p.user_id) " +
+               "WHERE tp.post_id = p.id " +
+                   "AND t.id = tp.term_id " +
+                   "AND p.status = 'publish' " +
+                   "AND p.type = 'post' and t.id = " + tag.Id +
+               " ORDER BY id DESC " +
+               "LIMIT " + PostsPerPage + " OFFSET " + (page - 1) * PostsPerPage;
+
+            var posts = (List<PostVoux>)_db.Query<PostVoux>(queryMain);
+
+            var ids = posts
                 .Select(t => t.Id)
                 .ToArray();
+            ViewBag.RecentPosts = RecentVouexPosts(ids, 10);
 
-            var posts = Database.Session.Query<Post>()
-                .OrderByDescending(b => b.CreateAt)
-                .Where(t => postIds.Contains(t.Id))                
-                .ToList();
+            ViewBag.Tags = GetTags();
 
-            var ids = posts.Select(t => t.Id).ToArray();
-
-            var baseQuery = Database.Session.Query<Post>()
-                .Where(t => t.Type == TypePost && t.Status == "publish" && t.CreateAt <= DateTime.Now)
-                .OrderByDescending(t => t.CreateAt);
-                       
-            ViewBag.RecentPosts = RecentPosts(baseQuery, ids, 10);
-
-            ViewBag.Tags = CheckPostPublished();
-
-            var postList = posts.Select(t => new PostsShow(t)).ToList();
+            var postList = posts.Select(t => new PostsVouxShow(t)).ToList();
             
-            return View(new PostsTag
+            return View(new PostsVouxTag
             {
                 Tag = tag,
-                Posts = new PageData<PostsShow>(postList, totalPostCount, page, PostsPerPage)
+                Posts = new PageData<PostsVouxShow>(postList, totalPostCount, page, PostsPerPage)
             });
         }
     }

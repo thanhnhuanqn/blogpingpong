@@ -6,7 +6,7 @@
 @using Humanizer
 @using Humanizer.Localisation
 @using NHibernate.Linq
-@model Blog.Infrastructure.PageData<Blog.ViewModels.PostsShow>
+@model Blog.Infrastructure.PageData<Blog.Models.PostsVouxShow>
 @{
     Thread.CurrentThread.CurrentUICulture = new CultureInfo("vi-VN"); //Set ngôn ngữ Việt}
     foreach (var item in Model)
@@ -15,7 +15,7 @@
         <article class="post">
             <div class="post-header">
                 <span class="cat">
-                @BuilLink(post.Category.Where(t => t.Taxonomy == "cat").ToList(), "tag")
+                @BuilLink(post.Categories, "tag")
             </span>
                 <h2>
                     <span>
@@ -24,7 +24,7 @@
                 </h2>
             </div>
             <div id="post-@post.Id" style="display: block;">
-                @if (item.PostImage != null)
+                @if (!string.IsNullOrEmpty(item.PostImage))
                 {
                     <div class="post-image">
                         <a href="@Url.RouteUrl("article", new {post.Slug})">
@@ -57,7 +57,7 @@
                     <a class="comment-link">@post.CommentCount bình luận</a>
                 </div>
                 <div class="meta-date">
-                    @(TimeSpan.FromMilliseconds((DateTime.Now - post.CreateAt).TotalMilliseconds).Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Year)) trước bởi <a title="author profile">@post.User.DisplayName</a>
+                    @(TimeSpan.FromMilliseconds((DateTime.Now - post.Created).TotalMilliseconds).Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Year)) trước bởi <a title="author profile">@post.UserName</a>
                 </div>
             </div>
         </article>
@@ -86,7 +86,7 @@
         </div>
     }
 </div>
-@helper BuilLink(List<Term> list, string typeCat)
+@helper BuilLink(List<LabelVoux> list, string typeCat)
 {
     var i = 0;
     foreach (var item in list)

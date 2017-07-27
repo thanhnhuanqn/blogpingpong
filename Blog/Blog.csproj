@@ -56,6 +56,10 @@
     <Reference Include="CKFinder">
       <HintPath>E:\Visual Studio 2013\Projects\eCommerce\eCommerce.News\bin\CKFinder.dll</HintPath>
     </Reference>
+    <Reference Include="Dapper, Version=1.50.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapper.1.50.2\lib\net451\Dapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
       <Private>True</Private>
@@ -300,6 +304,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\ModelVouxTheme.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Models\PostMeta.cs" />
     <Compile Include="Models\Role.cs" />

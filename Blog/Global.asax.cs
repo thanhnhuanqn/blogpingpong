@@ -34,7 +34,7 @@ namespace Blog
             bool allowCompression = false;
             bool.TryParse(ConfigurationManager.AppSettings["Compression"], out allowCompression);
 
-            allowCompression = false;
+            //allowCompression = false;
             if (allowCompression)
             {
                 // Implement HTTP compression
