@@ -1,44 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
-using System.Web;
-using Blog.Infrastructure;
+using Blog.ViewModels.VouxTheme;
 using Dapper;
 using MySql.Data.MySqlClient;
 
-namespace Blog.Models
-{    
-    public class SingletonDb
+namespace Blog.Services.VouxTheme
+{
+    public interface IVouxThemeService
     {
-        private static SingletonDb _dbInstance;
-        private readonly IDbConnection _db = new MySqlConnection(ConfigurationManager.ConnectionStrings["MySqlServerConnString"].ConnectionString);
-
-        private SingletonDb()
-        {
-        }
-
-        public static SingletonDb GetDbInstance()
-        {
-            return _dbInstance ?? (_dbInstance = new SingletonDb());
-        }
-
-        public IDbConnection GetDbConnection()
-        {            
-            return _db;
-        }
+        int CountPostTypeAndStatus(string type, string status);
+        List<PostVoux> GetAllPostsPublish(int page, int perPage);
+        PostVoux GetPost(string slugPost);
+        LabelVoux GetCategory(string slug);
+        int CountPostPublishOfCategory(long id);
+        List<PostVoux> GetPostsOfCategory(long idCategory, int page, int perPage);
+        IEnumerable<PostsRecentVoux> RecentVouexPosts(IEnumerable<long> ids, int take);
+        IEnumerable<LabelVoux> GetTags();
     }
-    public class DatabaseMySql
+
+    public class VouxThemeService : IVouxThemeService
     {
         protected static IDbConnection Db => new MySqlConnection(ConfigurationManager.ConnectionStrings["MySqlServerConnString"].ConnectionString);
-                
+
         public int CountPostTypeAndStatus(string type, string status)
         {
             var queryCountPost =
                "SELECT COUNT(*) " +
                "FROM posts " +
-               "WHERE type ='"+ type +"' AND status = '"+ status +"'";
+               "WHERE type ='" + type + "' AND status = '" + status + "'";
 
             return Db.Query<int>(queryCountPost).Single();
         }
@@ -63,7 +54,7 @@ namespace Blog.Models
                           "AND type='post' " +
                           "AND slug = '" + slugPost.Trim() + "'";
 
-            return Db.Query<PostVoux>(query).SingleOrDefault();            
+            return Db.Query<PostVoux>(query).SingleOrDefault();
         }
 
         public LabelVoux GetCategory(string slug)
@@ -101,7 +92,7 @@ namespace Blog.Models
                   "AND p.type = 'post' and t.id = " + idCategory +
               " ORDER BY id DESC " +
               "LIMIT " + perPage + " OFFSET " + (page - 1) * perPage;
-            
+
             return (List<PostVoux>)Db.Query<PostVoux>(queryMain);
         }
 
@@ -133,94 +124,44 @@ namespace Blog.Models
                 ;
 
             return Db.Query<LabelVoux>(query);
-        }        
-    }
-
-
-
-    public class PostsRecentVoux : DatabaseMySql
-    {
-        public long Id { get; set; }
-        public string Title { get; set; }
-        public string Slug { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime? Updated { get; set; }
-        public string PostImage
-        {
-            get
-            {
-                var queryCountPost = "SELECT guid " +
-                                     "FROM posts " +
-                                     "WHERE posts.id IN (" +
-                                                        "SELECT meta_value " +
-                                                        "FROM postmeta m, posts p " +
-                                                        "WHERE p.id = m.post_id " +
-                                                            "AND meta_key = 'thumbnail_id' " +
-                                                            "AND post_id = " + Id + ")";
-
-                return Db.Query<string>(queryCountPost).FirstOrDefault();
-            }
         }
 
-    }
-
-    public class PostVoux : PostsRecentVoux
-    {        
-        public string Content { get; set; }
-        public string Excerpt { get; set; }
-        public string Type { get; set; }
-        public string Status { get; set; }
-        public string UserName { get; set; }
-        public int CommentCount { get; set; }
-
-        public List<LabelVoux> Categories
+        public string GetMetaPost(long postId)
         {
-            get
-            {
-                var query =
+            var query = "SELECT guid " +
+                                    "FROM posts " +
+                                    "WHERE posts.id IN (" +
+                                                       "SELECT meta_value " +
+                                                       "FROM postmeta m, posts p " +
+                                                       "WHERE p.id = m.post_id " +
+                                                           "AND meta_key = 'thumbnail_id' " +
+                                                           "AND post_id = " + postId + ")";
+
+            return Db.Query<string>(query).FirstOrDefault();
+        }
+
+        public List<LabelVoux> GetCategoriesOfPost(long idPost)
+        {
+            var query =
                     "SELECT t.id, t.slug, t.name " +
                     "FROM terms t, posts p, term_posts tp " +
                     "WHERE t.id = tp.term_id " +
                         "AND tp.post_id = p.id " +
                         "AND t.taxonomy = 'cat' " +
-                        "AND p.id =" + Id;
-                return (List<LabelVoux>)Db.Query<LabelVoux>(query);
-            }
+                        "AND p.id =" + idPost;
+            return (List<LabelVoux>)Db.Query<LabelVoux>(query);
         }
 
-        public List<LabelVoux> Tags
+        public List<LabelVoux> GetTagsOfPost(long idPost)
         {
-            get
-            {
-                var query =
+            var query =
                     "SELECT t.id, t.slug, t.name " +
                     "FROM terms t, posts p, term_posts tp " +
                     "WHERE t.id = tp.term_id " +
                         "AND tp.post_id = p.id " +
                         "AND t.taxonomy = 'tag' " +
-                        "AND p.id =" + Id;
-                return (List<LabelVoux>)Db.Query<LabelVoux>(query);
-            }
+                        "AND p.id =" + idPost;
+            return (List<LabelVoux>)Db.Query<LabelVoux>(query);
         }
-    }
-
-    public class LabelVoux
-    {
-        
-        public long Id { get; set; }
-        public string Name { get; set; }
-        public string Slug { get; set; }
-        public int PostCount { get; set; }        
-    }
-
-    public class PostsVouxIndex
-    {
-        public PageData<PostVoux> Posts { get; set; }
-    }
-
-    public class PostsVouxTag
-    {
-        public LabelVoux Tag { get; set; }
-        public PageData<PostVoux> Posts { get; set; }
     }
 }

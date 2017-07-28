@@ -1,7 +1,8 @@
 ﻿using System.Linq;
 using System.Web.Mvc;
 using Blog.Infrastructure;
-using Blog.Models;
+using Blog.Services.VouxTheme;
+using Blog.ViewModels.VouxTheme;
 
 namespace Blog.Controllers
 {
@@ -11,9 +12,9 @@ namespace Blog.Controllers
 
         private const string TypePost = "post";        
 
-        private readonly DatabaseMySql _data;
-
-        public VouxThemeController(DatabaseMySql data)
+        private readonly IVouxThemeService _data;
+        
+        public VouxThemeController(IVouxThemeService data)
         {
             _data = data;
         }

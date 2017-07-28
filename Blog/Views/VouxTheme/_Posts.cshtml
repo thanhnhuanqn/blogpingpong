@@ -1,12 +1,9 @@
 ﻿@using System.Globalization
-@using System.Linq
 @using System.Threading
-@using Blog.Controllers
-@using Blog.Models
+@using Blog.ViewModels.VouxTheme
 @using Humanizer
 @using Humanizer.Localisation
-@using NHibernate.Linq
-@model Blog.Infrastructure.PageData<Blog.Models.PostVoux>
+@model Blog.Infrastructure.PageData<Blog.ViewModels.VouxTheme.PostVoux>
 @{
     Thread.CurrentThread.CurrentUICulture = new CultureInfo("vi-VN"); //Set ngôn ngữ Việt}
     foreach (var item in Model)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO.Compression;
 using System.Linq;
+using System.Security.Policy;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
@@ -18,9 +19,9 @@ namespace Blog
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);            
+            MvcHandler.DisableMvcResponseHeader = true;                        
             Database.Configure();
-            MvcHandler.DisableMvcResponseHeader = true;
         }
         protected void Application_PreSendRequestHeaders()
         {

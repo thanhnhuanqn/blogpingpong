@@ -330,16 +330,17 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
-    <Compile Include="Models\ModelVouxTheme.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Models\PostMeta.cs" />
     <Compile Include="Models\Role.cs" />
     <Compile Include="Models\Term.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\VouxTheme\VouxThemeService.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="ViewModels\Layout.cs" />
     <Compile Include="ViewModels\Posts.cs" />
+    <Compile Include="ViewModels\VouxTheme\IndexViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Readme\Elmah.txt" />

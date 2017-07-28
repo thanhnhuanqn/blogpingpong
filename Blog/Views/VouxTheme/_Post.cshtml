@@ -1,8 +1,6 @@
 ﻿@using Blog.Infrastructure
-@using Blog.Models
-@using Humanizer
-@using NHibernate.Linq
-@model Blog.Models.PostVoux
+@using Blog.ViewModels.VouxTheme
+@model Blog.ViewModels.VouxTheme.PostVoux
 @{ var currentURL = Request.Url.Scheme + System.Uri.SchemeDelimiter + Request.Url.Host; }
 
 <main class="post" id="single">
