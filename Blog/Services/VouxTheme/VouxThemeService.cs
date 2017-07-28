@@ -18,6 +18,9 @@ namespace Blog.Services.VouxTheme
         List<PostVoux> GetPostsOfCategory(long idCategory, int page, int perPage);
         IEnumerable<PostsRecentVoux> RecentVouexPosts(IEnumerable<long> ids, int take);
         IEnumerable<LabelVoux> GetTags();
+        string GetMetaPost(long postId);
+        List<LabelVoux> GetCategoriesOfPost(long idPost);
+        List<LabelVoux> GetTagsOfPost(long idPost);
     }
 
     public class VouxThemeService : IVouxThemeService

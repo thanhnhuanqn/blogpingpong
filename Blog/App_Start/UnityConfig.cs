@@ -2,7 +2,6 @@ using System;
 using Blog.Models;
 using Blog.Services.VouxTheme;
 using Microsoft.Practices.Unity;
-using Microsoft.Practices.Unity.Configuration;
 
 namespace Blog.App_Start
 {

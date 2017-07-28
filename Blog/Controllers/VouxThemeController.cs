@@ -21,7 +21,7 @@ namespace Blog.Controllers
         public ActionResult Index(int page = 1)
         {
             
-            var totalPostCount = _data.CountPostTypeAndStatus("post", "publish");
+            var totalPostCount = _data.CountPostTypeAndStatus(TypePost, "publish");
             
             var posts = _data.GetAllPostsPublish(page, PostsPerPage);
 
