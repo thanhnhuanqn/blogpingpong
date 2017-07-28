@@ -1,13 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
+﻿using System.Linq;
 using System.Web.Mvc;
-using Blog.Areas.admin.ViewModels;
 using Blog.Infrastructure;
 using Blog.Models;
-using Dapper;
-using MySql.Data.MySqlClient;
 
 namespace Blog.Controllers
 {

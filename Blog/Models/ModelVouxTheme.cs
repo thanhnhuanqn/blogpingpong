@@ -88,7 +88,7 @@ namespace Blog.Models
             return Db.Query<int>(queryCount).SingleOrDefault();
         }
 
-        public List<PostVoux> GetPostsOfCategory(long idCategory,int page, int perPage)
+        public List<PostVoux> GetPostsOfCategory(long idCategory, int page, int perPage)
         {
             var queryMain =
               "SELECT users.display_name as username, p.id, title, p.slug, excerpt, content, created_at as created, " +
@@ -133,8 +133,7 @@ namespace Blog.Models
                 ;
 
             return Db.Query<LabelVoux>(query);
-        }
-
+        }        
     }
 
 
