@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Web.Mvc;
-using Blog.ViewModels;
 using Blog.Infrastructure;
 using Blog.Models;
 using Dapper;
 using MySql.Data.MySqlClient;
-using NHibernate.Linq;
 
 namespace Blog.Controllers
 {
@@ -26,7 +23,7 @@ namespace Blog.Controllers
             var query =
                 "SELECT id, title, slug, created_at as created, updated_at as updated " +
                 "FROM posts " +
-                "WHERE type ='post' and status = 'publish' AND id NOT IN (" + string.Join(",", ids) + ") " +
+                "WHERE type ='post' AND status = 'publish' AND id NOT IN (" + string.Join(",", ids) + ") " +
                 "ORDER BY id DESC " +
                 "LIMIT " + take;
 
@@ -65,7 +62,7 @@ namespace Blog.Controllers
                 "LEFT JOIN users ON (users.id = posts.user_id) " +
                 "WHERE type ='post' and posts.status = 'publish' " +
                 "ORDER BY id DESC " +
-                "LIMIT " + PostsPerPage + " OFFSET " + (page -1) * PostsPerPage;
+                "LIMIT " + PostsPerPage + " OFFSET " + (page - 1) * PostsPerPage;
                         
             var posts = (List<PostVoux>)_db.Query<PostVoux>(query);
 
@@ -75,13 +72,11 @@ namespace Blog.Controllers
 
             ViewBag.RecentPosts = RecentVouexPosts(ids, 10);
 
-            ViewBag.Tags = GetTags();
-
-            var postList = posts.Select(t => new PostsVouxShow(t)).ToList();
+            ViewBag.Tags = GetTags();            
                         
             return View(new PostsVouxIndex
             {
-                Posts = new PageData<PostsVouxShow>(postList, totalPostCount, page, PostsPerPage)
+                Posts = new PageData<PostVoux>(posts, totalPostCount, page, PostsPerPage)
             });
         }
         /// <summary>
@@ -105,7 +100,7 @@ namespace Blog.Controllers
 
             ViewBag.Tags = GetTags();
 
-            return View(new PostsVouxShow(post));
+            return View(post);
         }
         /// <summary>
         /// Hiển thị bài viết theo tag
@@ -154,13 +149,11 @@ namespace Blog.Controllers
             ViewBag.RecentPosts = RecentVouexPosts(ids, 10);
 
             ViewBag.Tags = GetTags();
-
-            var postList = posts.Select(t => new PostsVouxShow(t)).ToList();
             
             return View(new PostsVouxTag
             {
                 Tag = tag,
-                Posts = new PageData<PostsVouxShow>(postList, totalPostCount, page, PostsPerPage)
+                Posts = new PageData<PostVoux>(posts, totalPostCount, page, PostsPerPage)
             });
         }
     }

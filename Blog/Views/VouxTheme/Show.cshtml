@@ -1,27 +1,27 @@
 ﻿@using Blog.Models
 @using Humanizer
 @using NHibernate.Linq
-@model Blog.Models.PostsVouxShow
+@model Blog.Models.PostVoux
 @{
-    ViewBag.Title = Model.Post.Title.Truncate(65);
+    ViewBag.Title = Model.Title.Truncate(65);
     Layout = "~/Views/VouxTheme/_LayoutSite.cshtml";
     var currentURL = Request.Url.Scheme + System.Uri.SchemeDelimiter + Request.Url.Host;
     ViewBag.TextLogo = Html.Raw("<h2>Ping Pong</h2>");
 }
 <section class="section" id="main">
     <div class="widget Blog">
-        @Html.Partial("_Post", Model.Post)
+        @Html.Partial("_Post", Model)
     </div>
 </section>
 @section meta{
-    <meta name="title" content="@Model.Post.Title" />
-    <meta name="keywords" content="@Model.Post.Title" />
-    <meta name="description" content="@Model.Post.Excerpt.Truncate(160)" />
-    <meta property="og:title" content="@Model.Post.Title" />    
+    <meta name="title" content="@Model.Title" />
+    <meta name="keywords" content="@Model.Title" />
+    <meta name="description" content="@Model.Excerpt.Truncate(160)" />
+    <meta property="og:title" content="@Model.Title" />    
     <meta property="og:image" content="@currentURL/uploads/tmp/@Model.PostImage" />
     <meta property="og:type" content="blog" />
     <meta property="og:url" content="@Request.Url" />
-    <meta property="og:description" content="@Model.Post.Excerpt.Truncate(160)" />
+    <meta property="og:description" content="@Model.Excerpt.Truncate(160)" />
     <link rel="canonical" href="@Request.Url" />
 }
 @section scripts {    

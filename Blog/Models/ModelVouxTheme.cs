@@ -9,32 +9,52 @@ using Dapper;
 using MySql.Data.MySqlClient;
 
 namespace Blog.Models
-{
-    public class PostVoux
+{    
+    public class SingletonDb
     {
-        public long Id { get; set; }
-        public string Title { get; set; }
-        public string Slug { get; set; }
+        private static SingletonDb _dbInstance;
+        private readonly IDbConnection _db = new MySqlConnection(ConfigurationManager.ConnectionStrings["MySqlServerConnString"].ConnectionString);
+
+        private SingletonDb()
+        {
+        }
+
+        public static SingletonDb GetDbInstance()
+        {
+            return _dbInstance ?? (_dbInstance = new SingletonDb());
+        }
+
+        public IDbConnection GetDbConnection()
+        {            
+            return _db;
+        }
+    }
+    public class DatabaseMySql
+    {
+        protected static IDbConnection Db => new MySqlConnection(ConfigurationManager.ConnectionStrings["MySqlServerConnString"].ConnectionString);
+    }
+
+    public class PostVoux : PostsRecentVoux
+    {        
         public string Content { get; set; }
         public string Excerpt { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime? Updated { get; set; }
         public string Type { get; set; }
         public string Status { get; set; }
         public string UserName { get; set; }
         public int CommentCount { get; set; }
-
-        private readonly IDbConnection _db = new MySqlConnection(ConfigurationManager.ConnectionStrings["MySqlServerConnString"].ConnectionString);
 
         public List<LabelVoux> Categories
         {
             get
             {
                 var query =
-                    "select t.id, t.slug, t.name " +
-                    "from terms t, posts p, term_posts tp " +
-                    "where t.id = tp.term_id and tp.post_id = p.id and t.taxonomy = 'cat' and p.id =" + Id;
-                return (List<LabelVoux>)_db.Query<LabelVoux>(query);
+                    "SELECT t.id, t.slug, t.name " +
+                    "FROM terms t, posts p, term_posts tp " +
+                    "WHERE t.id = tp.term_id " +
+                        "AND tp.post_id = p.id " +
+                        "AND t.taxonomy = 'cat' " +
+                        "AND p.id =" + Id;
+                return (List<LabelVoux>)Db.Query<LabelVoux>(query);
             }
         }
 
@@ -43,19 +63,21 @@ namespace Blog.Models
             get
             {
                 var query =
-                    "select t.id, t.slug, t.name " +
-                    "from terms t, posts p, term_posts tp " +
-                    "where t.id = tp.term_id and tp.post_id = p.id and t.taxonomy = 'tag' and p.id =" + Id;
-                return (List<LabelVoux>)_db.Query<LabelVoux>(query);
+                    "SELECT t.id, t.slug, t.name " +
+                    "FROM terms t, posts p, term_posts tp " +
+                    "WHERE t.id = tp.term_id " +
+                        "AND tp.post_id = p.id " +
+                        "AND t.taxonomy = 'tag' " +
+                        "AND p.id =" + Id;
+                return (List<LabelVoux>)Db.Query<LabelVoux>(query);
             }
         }
     }
 
 
 
-    public class PostsRecentVoux
+    public class PostsRecentVoux : DatabaseMySql
     {
-        readonly IDbConnection _db = new MySqlConnection(ConfigurationManager.ConnectionStrings["MySqlServerConnString"].ConnectionString);
 
         public long Id { get; set; }
         public string Title { get; set; }
@@ -66,16 +88,16 @@ namespace Blog.Models
         {
             get
             {
-                var queryCountPost = "SELECt guid " +
+                var queryCountPost = "SELECT guid " +
                                      "FROM posts " +
-                                     "WHERE posts.id in (" +
-                                     "SELECT meta_value " +
-                                     "FROM postmeta m, posts p " +
-                                     "WHERE p.id = m.post_id " +
-                                     "AND meta_key = 'thumbnail_id' " +
-                                     "AND post_id = " + Id + ")";
+                                     "WHERE posts.id IN (" +
+                                                        "SELECT meta_value " +
+                                                        "FROM postmeta m, posts p " +
+                                                        "WHERE p.id = m.post_id " +
+                                                            "AND meta_key = 'thumbnail_id' " +
+                                                            "AND post_id = " + Id + ")";
 
-                return _db.Query<string>(queryCountPost).FirstOrDefault();
+                return Db.Query<string>(queryCountPost).FirstOrDefault();
             }            
         }
 
@@ -92,38 +114,11 @@ namespace Blog.Models
 
     public class PostsVouxIndex
     {
-        public PageData<PostsVouxShow> Posts { get; set; }
+        public PageData<PostVoux> Posts { get; set; }
     }
-
-    public class PostsVouxShow
-    {
-        public string PostImage;
-        public PostVoux Post { get; set; }
-
-        public PostsVouxShow(PostVoux post)
-        {
-            IDbConnection db = new MySqlConnection(ConfigurationManager.ConnectionStrings["MySqlServerConnString"].ConnectionString);
-
-            Post = post;
-
-            var queryCountPost = "SELECt guid " +
-                                 "FROM posts " +
-                                 "WHERE posts.id in (" +
-                                                    "SELECT meta_value " +
-                                                    "FROM postmeta m, posts p " +
-                                                    "WHERE p.id = m.post_id " +
-                                                            "AND meta_key = 'thumbnail_id' " +
-                                                            "AND post_id = "+ post.Id + ")";
-
-            PostImage = db.Query<string>(queryCountPost).Single();
-                                    
-
-        }
-    }
-
     public class PostsVouxTag
     {
         public LabelVoux Tag { get; set; }
-        public PageData<PostsVouxShow> Posts { get; set; }
+        public PageData<PostVoux> Posts { get; set; }
     }
 }

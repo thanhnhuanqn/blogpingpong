@@ -6,12 +6,12 @@
 @using Humanizer
 @using Humanizer.Localisation
 @using NHibernate.Linq
-@model Blog.Infrastructure.PageData<Blog.Models.PostsVouxShow>
+@model Blog.Infrastructure.PageData<Blog.Models.PostVoux>
 @{
     Thread.CurrentThread.CurrentUICulture = new CultureInfo("vi-VN"); //Set ngôn ngữ Việt}
     foreach (var item in Model)
     {
-        var post = item.Post;
+        var post = item;
         <article class="post">
             <div class="post-header">
                 <span class="cat">
