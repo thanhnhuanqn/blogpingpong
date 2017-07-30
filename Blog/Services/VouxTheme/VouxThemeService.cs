@@ -16,7 +16,7 @@ namespace Blog.Services.VouxTheme
         LabelVoux GetCategory(string slug);
         int CountPostPublishOfCategory(long id);
         List<PostVoux> GetPostsOfCategory(long idCategory, int page, int perPage);
-        IEnumerable<PostsRecentVoux> RecentVouexPosts(IEnumerable<long> ids, int take);
+        List<PostsRecentVoux> RecentVouexPosts(IEnumerable<long> ids, int take);
         IEnumerable<LabelVoux> GetTags();
         string GetMetaPost(long postId);
         List<LabelVoux> GetCategoriesOfPost(long idPost);
@@ -27,6 +27,12 @@ namespace Blog.Services.VouxTheme
     {
         protected static IDbConnection Db => new MySqlConnection(ConfigurationManager.ConnectionStrings["MySqlServerConnString"].ConnectionString);
 
+        /// <summary>
+        /// Đếm số bài viết có kiểu dữ liệu là @type và trạng thái của bài viết @status
+        /// </summary>
+        /// <param name="type">"post"</param>
+        /// <param name="status">"publish"</param>
+        /// <returns>@int</returns>
         public int CountPostTypeAndStatus(string type, string status)
         {
             var queryCountPost =
@@ -37,6 +43,12 @@ namespace Blog.Services.VouxTheme
             return Db.Query<int>(queryCountPost).Single();
         }
 
+        /// <summary>
+        /// Lấy tất cả bài viết được publish, và phân trang chúng
+        /// </summary>
+        /// <param name="page">Trang hiện tại đang đứng</param>
+        /// <param name="perPage">Số bài trong một trang</param>
+        /// <returns>@List(PostVoux)</returns>
         public List<PostVoux> GetAllPostsPublish(int page, int perPage)
         {
             var query =
@@ -46,9 +58,54 @@ namespace Blog.Services.VouxTheme
                 "WHERE type ='post' AND posts.status = 'publish' " +
                 "ORDER BY id DESC " +
                 "LIMIT " + perPage + " OFFSET " + (page - 1) * perPage;
-
-            return (List<PostVoux>)Db.Query<PostVoux>(query);
+            var result = (List<PostVoux>) Db.Query<PostVoux>(query);
+            GetCategoriesAndTagForPosts(result);
+            return result;
         }
+        /// <summary>
+        /// Lấy danh mục và các tag cho 1 danh sách bài viết
+        /// </summary>
+        /// <param name="posts">Một mảng danh sách bài viết cần lấy Category và Tag</param>
+        private void GetCategoriesAndTagForPosts(List<PostVoux> posts)
+        {
+            if (posts == null) return ;
+
+            foreach (var t in posts)
+            {
+                GetCategoriesAndTagForPost(t);
+            }
+        }
+
+        /// <summary>
+        /// Lấy danh mục, các tag và hình ảnh cho một bài viết
+        /// </summary>
+        /// <param name="post">@object Bài viết cần lấy Categories, tags và Hình đại diện của bài viết</param>
+        private void GetCategoriesAndTagForPost(PostVoux post)
+        {
+            if (post == null) return ;
+
+            post.Categories = GetCategoriesOfPost(post.Id);
+            post.Tags = GetTagsOfPost(post.Id);
+            post.PostImage = GetMetaPost(post.Id);
+        }
+        /// <summary>
+        /// Lấy các hình ảnh đại diện cho một Mảng bài viết
+        /// </summary>
+        /// <param name="posts">Array - Mảng các bài viết cần lấy hình</param>
+        private void GetMetaForPosts(List<PostsRecentVoux> posts)
+        {
+            if (posts == null) return;
+            foreach (var post in posts)
+            {
+                post.PostImage = GetMetaPost(post.Id);
+            }
+        }   
+        
+        /// <summary>
+        /// Lấy một bài viết theo slug của nó
+        /// </summary>
+        /// <param name="slugPost">@slug</param>
+        /// <returns>@PostVoux</returns>
         public PostVoux GetPost(string slugPost)
         {
             var query = "SELECT id, title, slug, excerpt, content, created_at as created, updated_at as updated " +
@@ -56,10 +113,19 @@ namespace Blog.Services.VouxTheme
                         "WHERE status='publish' " +
                           "AND type='post' " +
                           "AND slug = '" + slugPost.Trim() + "'";
+            var result = Db.Query<PostVoux>(query).SingleOrDefault();
 
-            return Db.Query<PostVoux>(query).SingleOrDefault();
+            if (result == null) return null;
+
+            GetCategoriesAndTagForPost(result);
+
+            return result;
         }
-
+        /// <summary>
+        /// Lấy một Category đầy đủ thông tin dựa vào slug của nó
+        /// </summary>
+        /// <param name="slug">@slug của category</param>
+        /// <returns>@LabelVoux</returns>
         public LabelVoux GetCategory(string slug)
         {
             var query = "SELECT * FROM terms t WHERE t.slug = '" + slug.Trim() + "'";
@@ -96,11 +162,12 @@ namespace Blog.Services.VouxTheme
               " ORDER BY id DESC " +
               "LIMIT " + perPage + " OFFSET " + (page - 1) * perPage;
 
-            return (List<PostVoux>)Db.Query<PostVoux>(queryMain);
+            var result = (List<PostVoux>)Db.Query<PostVoux>(queryMain);
+            GetCategoriesAndTagForPosts(result);
+            return result;
         }
 
-
-        public IEnumerable<PostsRecentVoux> RecentVouexPosts(IEnumerable<long> ids, int take)
+        public List<PostsRecentVoux> RecentVouexPosts(IEnumerable<long> ids, int take)
         {
             var query =
                 "SELECT id, title, slug, created_at as created, updated_at as updated " +
@@ -109,7 +176,11 @@ namespace Blog.Services.VouxTheme
                 "ORDER BY id DESC " +
                 "LIMIT " + take;
 
-            return Db.Query<PostsRecentVoux>(query);
+            var results = (List<PostsRecentVoux>)Db.Query<PostsRecentVoux>(query);
+
+            GetMetaForPosts(results);
+
+            return results;
         }
 
         public IEnumerable<LabelVoux> GetTags()
@@ -138,6 +209,19 @@ namespace Blog.Services.VouxTheme
                                                        "FROM postmeta m, posts p " +
                                                        "WHERE p.id = m.post_id " +
                                                            "AND meta_key = 'thumbnail_id' " +
+                                                           "AND post_id = " + postId + ")";
+
+            return Db.Query<string>(query).FirstOrDefault();
+        }
+        public string GetMetaPost(long postId, string metaKey)
+        {
+            var query = "SELECT guid " +
+                                    "FROM posts " +
+                                    "WHERE posts.id IN (" +
+                                                       "SELECT meta_value " +
+                                                       "FROM postmeta m, posts p " +
+                                                       "WHERE p.id = m.post_id " +
+                                                           "AND meta_key = '"+ metaKey + "' " +
                                                            "AND post_id = " + postId + ")";
 
             return Db.Query<string>(query).FirstOrDefault();

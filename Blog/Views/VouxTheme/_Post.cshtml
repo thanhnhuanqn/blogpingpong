@@ -2,7 +2,6 @@
 @using Blog.ViewModels.VouxTheme
 @model Blog.ViewModels.VouxTheme.PostVoux
 @{ var currentURL = Request.Url.Scheme + System.Uri.SchemeDelimiter + Request.Url.Host; }
-
 <main class="post" id="single">
     <header class="post-header">
         <h1>
@@ -12,38 +11,18 @@
     </header>
     <article id="post-@Model.Id">        
         <div class="post-entry">            
-                @Html.Raw(Model.Content)            
+            @Html.Raw(Model.Content)            
         </div>
     </article>
-    <footer class="entry-meta hidden-print">
-        <div class="single-sharing-btns">
-            <h3 class="single-sharing-btns-title">Share This Story</h3>
-            <ul class="social-share-buttons style-default size-large" data-url="http://pingpongcode.com">
-                <li class="facebook" data-service="facebook" data-show="true" title="Share on Facebook">
-                    <a href="#" target="_blank">
-                        <i class="fa fa-facebook"></i>
-                        <label class="hidden-xs">Share on Facebook</label>
-                    </a>
-                </li>
-                <li class="twitter" data-service="twitter" data-show="true" title="Share on Twitter">
-                    <a href="#" target="_blank">
-                        <i class="fa fa-twitter"></i>
-                        <label class="hidden-xs">Share on Twitter</label>
-                    </a>
-                </li>
-                <li class="pinterest" data-service="pinterest" data-show="true" title="Pin this Post">
-                    <a href="#" target="_blank">
-                        <i class="fa fa-pinterest"></i>
-                        <label class="hidden-xs">Pin this Post</label>
-                    </a>
-                </li>
-            </ul>
-        </div>
-        <div class="entry-tags gray-2-secondary">
-            <strong class="tag-heading"><i class="fa fa-tag"></i>Tags:</strong>            
-            @BuilLink(Model.Tags, "tag")
-        </div>        
-    </footer>      
+    @if (Model.Tags.Count > 0)
+    {
+        <footer class="entry-meta hidden-print">
+            <div class="entry-tags gray-2-secondary">
+                <strong class="tag-heading"><i class="fa fa-tag"></i>Tags:</strong>
+                @BuilLink(Model.Tags, "tag")
+            </div>
+        </footer>
+    }
     <div class="fb-like" data-href="@currentURL@Url.RouteUrl("article", new {Model.Slug})" data-layout="standard" data-action="like" data-size="small" data-show-faces="true" data-share="true" data-width="600px"></div>
     <div class="fb-comments" data-numposts="5" data-href="@currentURL@Url.RouteUrl("article", new {Model.Slug})" data-width="100%"></div>
 </main>

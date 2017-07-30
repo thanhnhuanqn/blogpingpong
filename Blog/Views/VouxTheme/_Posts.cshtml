@@ -11,13 +11,9 @@
         var post = item;
         <article class="post">
             <div class="post-header">
-                <span class="cat">
-                @BuilLink(post.Categories, "tag")
-            </span>
+                <span class="cat">@BuilLink(post.Categories, "tag")</span>
                 <h2>
-                    <span>
-                    <a href="@Url.RouteUrl("article", new {post.Slug})">@post.Title</a>
-                </span>
+                    <span><a href="@Url.RouteUrl("article", new {post.Slug})">@post.Title</a></span>
                 </h2>
             </div>
             <div id="post-@post.Id" style="display: block;">
@@ -84,13 +80,4 @@
     }
 </div>
 @helper BuilLink(List<LabelVoux> list, string typeCat)
-{
-    var i = 0;
-    foreach (var item in list)
-    {
-        if (i != 0)
-        {<text>,</text> }
-            <a href="@Url.RouteUrl(typeCat, new { item.Slug})">@item.Name</a>
-        i++;
-    }
-}
+{var i = 0;foreach (var item in list){if (i != 0){<text>,</text> }<a href="@Url.RouteUrl(typeCat, new { item.Slug})">@item.Name</a>i++;}}

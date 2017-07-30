@@ -13,6 +13,7 @@ namespace Blog
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+            //routes.MapMvcAttributeRoutes();
 
             var adminNamespaces = new[] {typeof(PostsController).Namespace };
 

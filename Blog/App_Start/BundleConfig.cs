@@ -11,6 +11,9 @@ namespace Blog
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/scrollSpeed").Include(
+                        "~/Scripts/jQuery.scrollSpeed.js"));
+
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate*"));
 
@@ -37,8 +40,7 @@ namespace Blog
                 "~/Areas/admin/Scripts/forms.js"));
             
             //use
-            bundles.Add(new StyleBundle("~/Content/pingpong")
-                .Include("~/Content/bootstrap.css")
+            bundles.Add(new StyleBundle("~/Content/pingpong")                
                 .Include("~/Content/Style.css")
                 .Include("~/Content/font-awesome.css")
                 );            

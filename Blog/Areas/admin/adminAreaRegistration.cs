@@ -13,7 +13,7 @@ namespace Blog.Areas.admin
         }
 
         public override void RegisterArea(AreaRegistrationContext context) 
-        {
+        {            
             context.MapRoute(
                 "admin_default",
                 "admin/{controller}/{action}/{id}",

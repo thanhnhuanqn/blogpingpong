@@ -28,8 +28,7 @@ namespace Blog.Areas.admin.Controllers
 
             return post.Any();
 
-        }
-
+        }                
         // GET: admin/Posts
         public ActionResult Index(int? page, string status, string category, string tag, string user, string search)
         {

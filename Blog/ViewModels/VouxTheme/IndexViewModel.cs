@@ -14,7 +14,7 @@ namespace Blog.ViewModels.VouxTheme
         public string Slug { get; set; }
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
-        public string PostImage => GetMetaPost(Id);
+        public string PostImage { get; set; }
     }
 
     public class PostVoux : PostsRecentVoux
@@ -26,9 +26,9 @@ namespace Blog.ViewModels.VouxTheme
         public string UserName { get; set; }
         public int CommentCount { get; set; }
 
-        public List<LabelVoux> Categories => GetCategoriesOfPost(Id);
+        public List<LabelVoux> Categories { get; set; }
 
-        public List<LabelVoux> Tags => GetTagsOfPost(Id);
+        public List<LabelVoux> Tags { get; set; }
     }
 
     public class LabelVoux

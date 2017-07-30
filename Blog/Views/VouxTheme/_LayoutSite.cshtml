@@ -12,15 +12,9 @@
     @RenderSection("meta", false)
     <link rel="index" title="ping pong code, pingpongcode, phát triễn web, asp.net mvc, mvc" href="http://pingpongcode.com" />
     <meta name="google-site-verification" content="lIKdoxJQ98JZ3G-3EC8f-A2S0bzKfhvQmJ5-NPQUo6g" />            
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400&amp;subset=latin-ext,vietnamese" rel="stylesheet">    
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400&amp;subset=latin-ext,vietnamese" rel="stylesheet">        
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" type="text/css" rel="stylesheet"/>
     @Styles.Render("~/Content/pingpong")
-    @*<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-    <script>
-        (adsbygoogle = window.adsbygoogle || []).push({
-            google_ad_client: "ca-pub-5188322581066797",
-            enable_page_level_ads: true
-        });
-    </script>*@
 </head>
 <body>
     @Html.Partial("_Navigation")    
@@ -36,38 +30,41 @@
             </div>
         </div>
     </div>
-<footer id="footer-copyright">
-    <div class="container">
-        <p>
-            <a href="http://pingpongcode.com/" id="mycontent" title="PingPongCode" ref="dofollow">Ping Pong Code</a> @DateTime.Now.Year
-        </p>
-        <a class="to-top" href="#">Lên đầu trang <i class="fa fa-angle-double-up"></i></a>
-    </div>
-</footer>    
+    <footer id="footer-copyright">
+        <div class="container">
+            <p>
+                <a href="http://pingpongcode.com/" id="mycontent" title="PingPongCode" ref="dofollow">Ping Pong Code</a> @DateTime.Now.Year
+            </p>
+            <a class="to-top" href="#">Lên đầu trang <i class="fa fa-angle-double-up"></i></a>
+        </div>
+    </footer>    
     @Scripts.Render("~/bundles/jquery")
-    @*@Scripts.Render("~/bundles/jqueryval")
-    @Scripts.Render("~/bundles/bootstrap")*@
+    @Scripts.Render("~/bundles/scrollSpeed")    
     @RenderSection("scripts", required: false)
     @Scripts.Render("~/bundles/modernizr")    
     @*desert, sunburst, sons-of-obsidian, doxy*@
     <script src="https://rawgit.com/google/code-prettify/master/loader/run_prettify.js?autoload=true&amp;skin=desert" defer></script>
-    <script>
-        function REinit() {
-            $("pre").addClass("prettyprint");
-        }
-        $(document).ready(function () {
-            REinit();
-        });
-        REinit();
-        (function (i, s, o, g, r, a, m) {
-            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
-                (i[r].q = i[r].q || []).push(arguments)
-            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+<script>
+    
+    function REinit() {
+        $("pre").addClass("prettyprint");
+    }
+    $(document).ready(function () {
+        REinit();       
+    });
+    REinit();
+    jQuery.scrollSpeed(100, 800);
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date(); a = s.createElement(o),
             m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
-        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
-        ga('create', 'UA-28002206-2', 'auto');
-        ga('send', 'pageview');
-    </script>
+    ga('create', 'UA-28002206-2', 'auto');
+    ga('send', 'pageview');
+
+</script>        
+
 </body>
 </html>
